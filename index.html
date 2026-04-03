@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RF Daily Tracker</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0c0f; --surface: #13161b; --surface2: #1c2028; --border: #2a2f3a;
@@ -13,100 +11,86 @@
     --mediocre: #f59e0b; --poor: #ef4444; --accent: #f97316;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
   header { background: var(--surface); border-bottom: 2px solid var(--accent); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; letter-spacing: 1px; color: var(--accent); }
+  .logo { font-weight: 900; font-size: 22px; letter-spacing: 1px; color: var(--accent); }
   .logo span { color: var(--text); }
   .header-right { display: flex; align-items: center; gap: 12px; }
   .nav-tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: 8px; padding: 4px; }
-  .nav-tab { padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); border: none; background: transparent; transition: all 0.2s; }
+  .nav-tab { padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); border: none; background: transparent; }
   .nav-tab.active { background: var(--accent); color: #fff; }
   .rep-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; }
   main { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 999; }
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: min(440px, 92vw); text-align: center; }
-  .modal h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 28px; margin-bottom: 8px; color: var(--accent); }
+  .modal h2 { font-weight: 900; font-size: 28px; margin-bottom: 8px; color: var(--accent); }
   .modal p { color: var(--muted); margin-bottom: 24px; font-size: 14px; }
-  .modal input, .modal select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-size: 15px; font-family: 'Barlow', sans-serif; margin-bottom: 12px; outline: none; }
-  .modal input:focus, .modal select:focus { border-color: var(--accent); }
+  .modal input, .modal select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-size: 15px; margin-bottom: 12px; outline: none; }
   .modal select option { background: var(--surface2); }
-  .btn-primary { background: var(--accent); color: #fff; border: none; border-radius: 8px; width: 100%; padding: 14px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; cursor: pointer; }
+  .btn-primary { background: var(--accent); color: #fff; border: none; border-radius: 8px; width: 100%; padding: 14px; font-weight: 700; font-size: 17px; cursor: pointer; }
   .log-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
-  .log-card h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
-  .time-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 10px; font-size: 13px; font-weight: 600; color: var(--accent); font-family: 'Barlow Condensed', sans-serif; }
+  .log-card h3 { font-weight: 700; font-size: 20px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+  .time-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 10px; font-size: 13px; font-weight: 600; color: var(--accent); }
   .rating-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
-  .rating-btn { padding: 12px 8px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; transition: all 0.2s; text-align: center; background: var(--surface2); color: var(--muted); }
+  .rating-btn { padding: 12px 8px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; font-weight: 700; font-size: 14px; text-align: center; background: var(--surface2); color: var(--muted); }
   .rating-btn .icon { font-size: 20px; display: block; margin-bottom: 4px; }
-  .rating-btn:hover { transform: translateY(-2px); }
-  .rating-btn.selected-awesome { background: rgba(34,197,94,0.15); border-color: var(--awesome); color: var(--awesome); }
-  .rating-btn.selected-good { background: rgba(59,130,246,0.15); border-color: var(--good); color: var(--good); }
-  .rating-btn.selected-mediocre { background: rgba(245,158,11,0.15); border-color: var(--mediocre); color: var(--mediocre); }
-  .rating-btn.selected-poor { background: rgba(239,68,68,0.15); border-color: var(--poor); color: var(--poor); }
+  .sel-awesome { background: rgba(34,197,94,0.15); border-color: var(--awesome); color: var(--awesome); }
+  .sel-good { background: rgba(59,130,246,0.15); border-color: var(--good); color: var(--good); }
+  .sel-mediocre { background: rgba(245,158,11,0.15); border-color: var(--mediocre); color: var(--mediocre); }
+  .sel-poor { background: rgba(239,68,68,0.15); border-color: var(--poor); color: var(--poor); }
   .activity-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; }
-  textarea { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; resize: none; height: 80px; outline: none; }
-  textarea:focus { border-color: var(--accent); }
+  textarea { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-size: 14px; resize: none; height: 80px; outline: none; }
   textarea::placeholder { color: var(--muted); }
-  .mic-btn { width: 48px; height: 48px; border-radius: 12px; border: 2px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .mic-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .mic-btn.recording { border-color: var(--poor); background: rgba(239,68,68,0.15); color: var(--poor); animation: pulse 1s infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .mic-btn { width: 48px; height: 48px; border-radius: 12px; border: 2px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .mic-recording { border-color: var(--poor); background: rgba(239,68,68,0.15); color: var(--poor); }
   .submit-row { display: flex; gap: 10px; align-items: center; }
-  .btn-submit { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
-  .btn-submit:hover { filter: brightness(1.1); }
+  .btn-submit { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-weight: 700; font-size: 16px; cursor: pointer; }
   .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
   .save-status { font-size: 13px; color: var(--muted); }
-  .save-status.saved { color: var(--awesome); }
-  .section-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .save-ok { color: var(--awesome); }
+  .section-title { font-weight: 900; font-size: 22px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
   .entry-list { display: flex; flex-direction: column; gap: 10px; }
-  .entry-item { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid; border-radius: 10px; padding: 14px 16px; display: flex; align-items: flex-start; gap: 14px; }
-  .entry-item.awesome { border-left-color: var(--awesome); }
-  .entry-item.good { border-left-color: var(--good); }
-  .entry-item.mediocre { border-left-color: var(--mediocre); }
-  .entry-item.poor { border-left-color: var(--poor); }
-  .entry-time { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; color: var(--muted); white-space: nowrap; min-width: 80px; }
+  .entry-item { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid; border-radius: 10px; padding: 14px 16px; display: flex; gap: 14px; }
+  .e-awesome { border-left-color: var(--awesome); }
+  .e-good { border-left-color: var(--good); }
+  .e-mediocre { border-left-color: var(--mediocre); }
+  .e-poor { border-left-color: var(--poor); }
+  .entry-time { font-weight: 700; font-size: 15px; color: var(--muted); white-space: nowrap; min-width: 80px; }
   .entry-content { flex: 1; }
-  .entry-activity { font-size: 14px; color: var(--text); line-height: 1.5; }
-  .entry-rating { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; margin-top: 6px; display: inline-block; }
-  .badge-awesome { background: rgba(34,197,94,0.15); color: var(--awesome); }
-  .badge-good { background: rgba(59,130,246,0.15); color: var(--good); }
-  .badge-mediocre { background: rgba(245,158,11,0.15); color: var(--mediocre); }
-  .badge-poor { background: rgba(239,68,68,0.15); color: var(--poor); }
+  .entry-activity { font-size: 14px; line-height: 1.5; }
+  .entry-rating { font-weight: 700; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; margin-top: 6px; display: inline-block; }
+  .b-awesome { background: rgba(34,197,94,0.15); color: var(--awesome); }
+  .b-good { background: rgba(59,130,246,0.15); color: var(--good); }
+  .b-mediocre { background: rgba(245,158,11,0.15); color: var(--mediocre); }
+  .b-poor { background: rgba(239,68,68,0.15); color: var(--poor); }
   .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
   .summary-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
   .stat-box { background: var(--surface2); border-radius: 10px; padding: 14px; text-align: center; }
-  .stat-count { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 32px; display: block; }
+  .stat-count { font-weight: 900; font-size: 32px; display: block; }
   .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
   .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-  .rep-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; transition: border-color 0.2s; }
-  .rep-card:hover { border-color: var(--accent); }
-  .rep-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; margin-bottom: 4px; }
+  .rep-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .rep-name { font-weight: 700; font-size: 18px; margin-bottom: 4px; }
   .rep-market { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
   .rep-score-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
   .rep-score-fill { height: 100%; border-radius: 3px; }
   .rep-mini-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .mini-stat { background: var(--surface2); border-radius: 6px; padding: 6px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; }
-  .mini-label { font-size: 9px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-  .rep-last-entry { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
-  .rep-last-entry strong { color: var(--text); font-size: 13px; }
-  .day-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
-  .ai-summary { background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 14px 16px; font-size: 14px; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
-  .loading-dot { display: inline-block; animation: blink 1.2s infinite; font-size: 18px; }
-  @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
-  .perf-score { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 48px; text-align: center; margin: 10px 0; }
+  .mini-stat { background: var(--surface2); border-radius: 6px; padding: 6px; text-align: center; font-weight: 700; font-size: 16px; }
+  .mini-label { font-size: 9px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .rep-last { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .rep-last strong { color: var(--text); font-size: 13px; }
+  .eod-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+  .ai-summary { background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 14px 16px; font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
+  .perf-score { font-weight: 900; font-size: 48px; text-align: center; margin: 10px 0; }
   .perf-label { text-align: center; font-size: 13px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
   .hour-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
-  .hour-pill { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-  .hour-pill:hover { border-color: var(--accent); color: var(--accent); }
-  .hour-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .hour-pill.logged { border-color: var(--good); color: var(--good); }
+  .hour-pill { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-weight: 600; font-size: 13px; cursor: pointer; }
+  .hour-active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .hour-logged { border-color: var(--good); color: var(--good); }
   .empty { text-align: center; padding: 40px 20px; color: var(--muted); }
   .empty .icon { font-size: 40px; margin-bottom: 12px; }
-  .empty p { font-size: 14px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .dot-live { background: var(--awesome); animation: pulse 2s infinite; }
-  .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
-  @keyframes spin { to { transform: rotate(360deg); } }
   .hidden { display: none !important; }
+  .dot-live { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--awesome); }
   @media (max-width: 600px) { .rating-row { grid-template-columns: repeat(2, 1fr); } .summary-stats { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
@@ -116,7 +100,7 @@
   <div class="modal">
     <h2>RF DAILY TRACKER</h2>
     <p>Roofing Force · Hourly Performance Log</p>
-    <input type="text" id="repNameInput" placeholder="Your Name" autocomplete="name">
+    <input type="text" id="repNameInput" placeholder="Your Name">
     <select id="repMarketInput">
       <option value="">Select Market</option>
       <option>Kansas City</option>
@@ -135,7 +119,7 @@
   <div class="header-right">
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showView('log')">My Log</button>
-      <button class="nav-tab" onclick="showView('team')">Team <span class="dot dot-live" style="margin-left:4px"></span></button>
+      <button class="nav-tab" onclick="showView('team')">Team <span class="dot-live" style="margin-left:4px"></span></button>
     </div>
     <div class="rep-badge" onclick="changeRep()" id="repBadgeBtn">—</div>
   </div>
@@ -153,14 +137,11 @@
         <button class="rating-btn" data-rating="Poor" onclick="selectRating(this)"><span class="icon">📉</span>POOR</button>
       </div>
       <div class="activity-row">
-        <textarea id="activityText" placeholder="What did you do this hour? (type or tap the mic to speak)"></textarea>
-        <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Speak your activity">🎤</button>
+        <textarea id="activityText" placeholder="What did you do this hour? (type or tap mic to speak)"></textarea>
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
       </div>
       <div class="submit-row">
-        <button class="btn-submit" onclick="saveEntry()" id="saveBtn">
-          <span id="saveBtnText">Save Hour</span>
-          <span id="saveBtnSpinner" class="hidden"><span class="spinner"></span></span>
-        </button>
+        <button class="btn-submit" onclick="saveEntry()" id="saveBtn">Save Hour</button>
         <span class="save-status" id="saveStatus"></span>
       </div>
     </div>
@@ -182,23 +163,23 @@
     </div>
 
     <div style="text-align:center;margin-bottom:20px;">
-      <button class="btn-submit" onclick="generateEOD()" style="margin:0 auto;background:var(--surface);border:2px solid var(--accent);color:var(--accent)">✨ Generate End-of-Day Summary</button>
+      <button class="btn-submit" onclick="generateEOD()" style="background:var(--surface);border:2px solid var(--accent);color:var(--accent)">✨ End-of-Day Summary</button>
     </div>
 
-    <div class="day-summary hidden" id="eodCard">
+    <div class="eod-card hidden" id="eodCard">
       <div class="section-title">📋 End-of-Day Summary</div>
       <div class="ai-summary" id="eodContent"></div>
     </div>
 
     <div class="section-title">Today's Log</div>
     <div class="entry-list" id="entryList">
-      <div class="empty"><div class="icon">📋</div><p>No entries yet. Log your first hour above.</p></div>
+      <div class="empty"><div class="icon">📋</div><p>No entries yet.</p></div>
     </div>
   </div>
 
   <div id="view-team" class="hidden">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div class="section-title" style="margin-bottom:0">Team Dashboard <span class="dot dot-live"></span></div>
+      <div class="section-title" style="margin-bottom:0">Team Dashboard <span class="dot-live"></span></div>
       <div style="font-size:13px;color:var(--muted)" id="teamDate"></div>
     </div>
     <div class="team-grid" id="teamGrid">
@@ -207,182 +188,199 @@
   </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SUPABASE_URL = 'https://inwtlvzkwaslofqfrlpc.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlud3Rsdnprd2FzbG9mcWZybHBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzI2NDcsImV4cCI6MjA4ODMwODY0N30.bpjIExAjKo54a4X8QqgR2gn6LpVseEYopXk2RGQdQrE';
 const TABLE = 'rf_hourly_log';
 const HOURS = ['7 AM','8 AM','9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM','4 PM','5 PM','6 PM','7 PM','8 PM'];
-const RATING_SCORES = { Awesome:100, Good:75, Mediocre:40, Poor:10 };
+const SCORES = { Awesome:100, Good:75, Mediocre:40, Poor:10 };
 
-let sb, repName, repMarket, selectedRating=null, selectedHour=null, recognition, isRecording=false, todayEntries=[];
+let sb, repName, repMarket, selectedRating=null, selectedHour=null, recognition, isRecording=false, entries=[];
 
-document.addEventListener('DOMContentLoaded', () => {
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.onload = function() {
+  try {
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch(e) {
+    alert('Supabase failed to load: ' + e.message);
+    return;
+  }
   repName = localStorage.getItem('rf_rep_name');
   repMarket = localStorage.getItem('rf_rep_market');
-  if (repName && repMarket) { document.getElementById('setupModal').style.display='none'; initApp(); }
-  updateTimeClock();
-  setInterval(updateTimeClock, 60000);
-});
+  if (repName && repMarket) {
+    document.getElementById('setupModal').style.display = 'none';
+    initApp();
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+};
 
-async function startSession() {
-  const name = document.getElementById('repNameInput').value.trim();
-  const market = document.getElementById('repMarketInput').value;
-  if (!name || !market) { alert('Please enter your name and select a market.'); return; }
-  repName=name; repMarket=market;
-  localStorage.setItem('rf_rep_name', name);
-  localStorage.setItem('rf_rep_market', market);
-  document.getElementById('setupModal').style.display='none';
+function startSession() {
+  const n = document.getElementById('repNameInput').value.trim();
+  const m = document.getElementById('repMarketInput').value;
+  if (!n || !m) { alert('Enter your name and select a market.'); return; }
+  repName = n; repMarket = m;
+  localStorage.setItem('rf_rep_name', n);
+  localStorage.setItem('rf_rep_market', m);
+  document.getElementById('setupModal').style.display = 'none';
   initApp();
 }
 
-function changeRep() { localStorage.removeItem('rf_rep_name'); localStorage.removeItem('rf_rep_market'); location.reload(); }
-
-async function initApp() {
-  document.getElementById('repBadgeBtn').textContent = repName;
-  buildHourSelector();
-  await loadTodayEntries();
-  subscribeRealtime();
+function changeRep() {
+  localStorage.clear();
+  location.reload();
 }
 
-function buildHourSelector() {
-  const container = document.getElementById('hourSelector');
-  const cur = formatHourLabel(new Date().getHours());
-  container.innerHTML = '';
+function initApp() {
+  document.getElementById('repBadgeBtn').textContent = repName;
+  buildHours();
+  loadEntries();
+  subscribe();
+}
+
+function buildHours() {
+  const c = document.getElementById('hourSelector');
+  const cur = hourLabel(new Date().getHours());
+  c.innerHTML = '';
   HOURS.forEach(h => {
-    const pill = document.createElement('button');
-    pill.className = 'hour-pill' + (h===cur?' active':'');
-    pill.textContent = h; pill.dataset.hour = h;
-    pill.onclick = () => { document.querySelectorAll('.hour-pill').forEach(p=>p.classList.remove('active')); pill.classList.add('active'); selectedHour=h; };
-    container.appendChild(pill);
+    const b = document.createElement('button');
+    b.className = 'hour-pill' + (h===cur ? ' hour-active' : '');
+    b.textContent = h; b.dataset.hour = h;
+    b.onclick = () => { document.querySelectorAll('.hour-pill').forEach(p=>p.classList.remove('hour-active')); b.classList.add('hour-active'); selectedHour=h; };
+    c.appendChild(b);
   });
   selectedHour = cur;
 }
 
-function formatHourLabel(h) {
-  if (h===0) return '12 AM'; if (h<12) return h+' AM'; if (h===12) return '12 PM'; return (h-12)+' PM';
+function hourLabel(h) {
+  if(h===0) return '12 AM'; if(h<12) return h+' AM'; if(h===12) return '12 PM'; return (h-12)+' PM';
 }
 
-function markHourLogged(hour) { document.querySelectorAll('.hour-pill').forEach(p => { if(p.dataset.hour===hour) p.classList.add('logged'); }); }
+function markLogged(h) {
+  document.querySelectorAll('.hour-pill').forEach(p => { if(p.dataset.hour===h) p.classList.add('hour-logged'); });
+}
 
-function updateTimeClock() {
-  const now=new Date(), h=now.getHours(), m=now.getMinutes();
+function updateClock() {
+  const n=new Date(), h=n.getHours(), m=n.getMinutes();
   document.getElementById('currentTimeChip').textContent = (h%12||12)+':'+(m+'').padStart(2,'0')+' '+(h>=12?'PM':'AM');
 }
 
 function selectRating(btn) {
-  document.querySelectorAll('.rating-btn').forEach(b=>b.className='rating-btn');
+  document.querySelectorAll('.rating-btn').forEach(b => { b.className='rating-btn'; });
   selectedRating = btn.dataset.rating;
-  btn.classList.add('selected-'+selectedRating.toLowerCase());
+  btn.classList.add('sel-'+selectedRating.toLowerCase());
 }
 
 function toggleMic() {
-  if (!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)) { alert('Use Chrome for voice input.'); return; }
-  if (isRecording) { recognition.stop(); return; }
-  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
-  recognition = new SR(); recognition.lang='en-US';
-  recognition.onstart = () => { isRecording=true; document.getElementById('micBtn').classList.add('recording'); document.getElementById('micBtn').textContent='⏹'; };
-  recognition.onresult = (e) => { const t=e.results[0][0].transcript; const ta=document.getElementById('activityText'); ta.value=ta.value?ta.value+' '+t:t; };
-  recognition.onend = () => { isRecording=false; document.getElementById('micBtn').classList.remove('recording'); document.getElementById('micBtn').textContent='🎤'; };
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('Use Chrome for voice.');return;}
+  if(isRecording){recognition.stop();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR(); recognition.lang='en-US';
+  recognition.onstart=()=>{isRecording=true;document.getElementById('micBtn').className='mic-btn mic-recording';document.getElementById('micBtn').textContent='⏹';};
+  recognition.onresult=(e)=>{const t=e.results[0][0].transcript;const ta=document.getElementById('activityText');ta.value=ta.value?ta.value+' '+t:t;};
+  recognition.onend=()=>{isRecording=false;document.getElementById('micBtn').className='mic-btn';document.getElementById('micBtn').textContent='🎤';};
   recognition.start();
 }
 
 async function saveEntry() {
-  const activity = document.getElementById('activityText').value.trim();
-  if (!selectedRating) { alert('Please select a rating.'); return; }
-  if (!activity) { alert('Please describe what you did this hour.'); return; }
-  const btn = document.getElementById('saveBtn');
-  btn.disabled=true; document.getElementById('saveBtnText').classList.add('hidden'); document.getElementById('saveBtnSpinner').classList.remove('hidden');
-  const today = new Date().toISOString().split('T')[0];
-  const { error } = await sb.from(TABLE).upsert({ rep_name:repName, market:repMarket, date:today, hour_label:selectedHour, activity, rating:selectedRating, created_at:new Date().toISOString() }, { onConflict:'rep_name,date,hour_label' });
-  btn.disabled=false; document.getElementById('saveBtnText').classList.remove('hidden'); document.getElementById('saveBtnSpinner').classList.add('hidden');
-  if (error) { document.getElementById('saveStatus').textContent='❌ '+error.message; return; }
-  document.getElementById('activityText').value=''; selectedRating=null;
+  const act = document.getElementById('activityText').value.trim();
+  if(!selectedRating){alert('Select a rating.');return;}
+  if(!act){alert('Describe your activity.');return;}
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true; btn.textContent='Saving…';
+  const today=new Date().toISOString().split('T')[0];
+  const {error}=await sb.from(TABLE).upsert({rep_name:repName,market:repMarket,date:today,hour_label:selectedHour,activity:act,rating:selectedRating,created_at:new Date().toISOString()},{onConflict:'rep_name,date,hour_label'});
+  btn.disabled=false; btn.textContent='Save Hour';
+  if(error){document.getElementById('saveStatus').textContent='❌ '+error.message;return;}
+  document.getElementById('activityText').value='';
+  selectedRating=null;
   document.querySelectorAll('.rating-btn').forEach(b=>b.className='rating-btn');
-  markHourLogged(selectedHour);
-  const ss=document.getElementById('saveStatus'); ss.textContent='✓ Saved!'; ss.className='save-status saved';
+  markLogged(selectedHour);
+  const ss=document.getElementById('saveStatus'); ss.textContent='✓ Saved!'; ss.className='save-status save-ok';
   setTimeout(()=>{ss.textContent='';ss.className='save-status';},2500);
-  await loadTodayEntries();
+  loadEntries();
 }
 
-async function loadTodayEntries() {
+async function loadEntries() {
   const today=new Date().toISOString().split('T')[0];
-  const {data} = await sb.from(TABLE).select('*').eq('rep_name',repName).eq('date',today).order('created_at');
-  todayEntries=data||[]; renderEntries(); updateSummaryStats();
+  const {data,error}=await sb.from(TABLE).select('*').eq('rep_name',repName).eq('date',today).order('created_at');
+  if(error){console.error(error);return;}
+  entries=data||[];
+  renderEntries();
+  updateStats();
 }
 
 function renderEntries() {
   const list=document.getElementById('entryList');
-  todayEntries.forEach(e=>markHourLogged(e.hour_label));
-  if (!todayEntries.length) { list.innerHTML='<div class="empty"><div class="icon">📋</div><p>No entries yet.</p></div>'; return; }
-  const sorted=[...todayEntries].sort((a,b)=>HOURS.indexOf(a.hour_label)-HOURS.indexOf(b.hour_label));
-  list.innerHTML=sorted.map(e=>`<div class="entry-item ${e.rating.toLowerCase()}"><div class="entry-time">${e.hour_label}</div><div class="entry-content"><div class="entry-activity">${e.activity}</div><span class="entry-rating badge-${e.rating.toLowerCase()}">${e.rating}</span></div></div>`).join('');
+  entries.forEach(e=>markLogged(e.hour_label));
+  if(!entries.length){list.innerHTML='<div class="empty"><div class="icon">📋</div><p>No entries yet.</p></div>';return;}
+  const sorted=[...entries].sort((a,b)=>HOURS.indexOf(a.hour_label)-HOURS.indexOf(b.hour_label));
+  list.innerHTML=sorted.map(e=>`<div class="entry-item e-${e.rating.toLowerCase()}"><div class="entry-time">${e.hour_label}</div><div class="entry-content"><div class="entry-activity">${e.activity}</div><span class="entry-rating b-${e.rating.toLowerCase()}">${e.rating}</span></div></div>`).join('');
 }
 
-function updateSummaryStats() {
-  const c={Awesome:0,Good:0,Mediocre:0,Poor:0}; let total=0;
-  todayEntries.forEach(e=>{c[e.rating]=(c[e.rating]||0)+1;total+=RATING_SCORES[e.rating]||0;});
+function updateStats() {
+  const c={Awesome:0,Good:0,Mediocre:0,Poor:0}; let tot=0;
+  entries.forEach(e=>{c[e.rating]=(c[e.rating]||0)+1;tot+=SCORES[e.rating]||0;});
   document.getElementById('countAwesome').textContent=c.Awesome;
   document.getElementById('countGood').textContent=c.Good;
   document.getElementById('countMediocre').textContent=c.Mediocre;
   document.getElementById('countPoor').textContent=c.Poor;
-  const n=todayEntries.length, avg=n?Math.round(total/n):0;
+  const n=entries.length, avg=n?Math.round(tot/n):0;
   const el=document.getElementById('perfScore');
   el.textContent=n?avg:'—';
   el.style.color=avg>=80?'var(--awesome)':avg>=60?'var(--good)':avg>=35?'var(--mediocre)':n?'var(--poor)':'var(--accent)';
 }
 
 async function generateEOD() {
-  if (!todayEntries.length) { alert('Log some hours first!'); return; }
+  if(!entries.length){alert('Log some hours first!');return;}
   document.getElementById('eodCard').classList.remove('hidden');
-  document.getElementById('eodContent').innerHTML='<span class="loading-dot">●</span> <span class="loading-dot" style="animation-delay:0.2s">●</span> <span class="loading-dot" style="animation-delay:0.4s">●</span>';
-  const summary=todayEntries.map(e=>`${e.hour_label}: [${e.rating}] ${e.activity}`).join('\n');
-  const c={Awesome:0,Good:0,Mediocre:0,Poor:0}; todayEntries.forEach(e=>c[e.rating]=(c[e.rating]||0)+1);
-  const prompt=`You are a roofing sales performance coach. Rep: ${repName}, Market: ${repMarket}.\n\nHourly log:\n${summary}\n\nRatings: ${c.Awesome} Awesome, ${c.Good} Good, ${c.Mediocre} Mediocre, ${c.Poor} Poor.\n\nWrite a direct 3-5 paragraph end-of-day summary: acknowledge wins, flag patterns in low hours, give 2-3 tips for tomorrow, end with a motivating one-liner. Hard-charging sales team tone.`;
+  document.getElementById('eodContent').textContent='Generating…';
+  const sum=entries.map(e=>`${e.hour_label}: [${e.rating}] ${e.activity}`).join('\n');
+  const c={Awesome:0,Good:0,Mediocre:0,Poor:0}; entries.forEach(e=>c[e.rating]=(c[e.rating]||0)+1);
   try {
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`You are a roofing sales coach. Rep: ${repName}, Market: ${repMarket}.\n\nLog:\n${sum}\n\nRatings: ${c.Awesome} Awesome, ${c.Good} Good, ${c.Mediocre} Mediocre, ${c.Poor} Poor.\n\nWrite a direct 3-5 paragraph end-of-day summary: acknowledge wins, flag low-hour patterns, give 2-3 tips for tomorrow, end with a motivating one-liner.`}]})});
     const data=await res.json();
-    document.getElementById('eodContent').textContent=data.content?.find(c=>c.type==='text')?.text||'Summary unavailable.';
-  } catch(e) { document.getElementById('eodContent').textContent='Could not generate summary.'; }
+    document.getElementById('eodContent').textContent=data.content?.find(x=>x.type==='text')?.text||'Unavailable.';
+  } catch(e){document.getElementById('eodContent').textContent='Could not generate summary.';}
 }
 
-async function loadTeamData() {
+async function loadTeam() {
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('teamDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   const {data}=await sb.from(TABLE).select('*').eq('date',today).order('created_at',{ascending:false});
-  if (!data||!data.length) { document.getElementById('teamGrid').innerHTML='<div class="empty" style="grid-column:1/-1"><div class="icon">👥</div><p>No activity logged today yet.</p></div>'; return; }
+  if(!data||!data.length){document.getElementById('teamGrid').innerHTML='<div class="empty" style="grid-column:1/-1"><div class="icon">👥</div><p>No activity today yet.</p></div>';return;}
   const reps={};
-  data.forEach(e=>{ if(!reps[e.rep_name]) reps[e.rep_name]={name:e.rep_name,market:e.market,entries:[]}; reps[e.rep_name].entries.push(e); });
+  data.forEach(e=>{if(!reps[e.rep_name])reps[e.rep_name]={name:e.rep_name,market:e.market,entries:[]};reps[e.rep_name].entries.push(e);});
   const grid=document.getElementById('teamGrid'); grid.innerHTML='';
-  Object.values(reps).sort((a,b)=>avgScore(b.entries)-avgScore(a.entries)).forEach(rep=>{
+  Object.values(reps).sort((a,b)=>avg(b.entries)-avg(a.entries)).forEach(rep=>{
     const c={Awesome:0,Good:0,Mediocre:0,Poor:0}; rep.entries.forEach(e=>c[e.rating]=(c[e.rating]||0)+1);
-    const avg=avgScore(rep.entries), last=rep.entries[0];
-    const bc=avg>=80?'var(--awesome)':avg>=60?'var(--good)':avg>=35?'var(--mediocre)':'var(--poor)';
-    const card=document.createElement('div'); card.className='rep-card';
-    card.innerHTML=`<div class="rep-name">${rep.name}</div><div class="rep-market">${rep.market} · ${rep.entries.length} hrs · Score: <strong style="color:${bc}">${avg}</strong></div><div class="rep-score-bar"><div class="rep-score-fill" style="width:${avg}%;background:${bc}"></div></div><div class="rep-mini-stats"><div class="mini-stat" style="color:var(--awesome)">${c.Awesome}<div class="mini-label">🔥</div></div><div class="mini-stat" style="color:var(--good)">${c.Good}<div class="mini-label">👍</div></div><div class="mini-stat" style="color:var(--mediocre)">${c.Mediocre}<div class="mini-label">😐</div></div><div class="mini-stat" style="color:var(--poor)">${c.Poor}<div class="mini-label">📉</div></div></div><div class="rep-last-entry"><strong>${last.hour_label}</strong> — ${last.activity.substring(0,80)}${last.activity.length>80?'…':''} <span class="entry-rating badge-${last.rating.toLowerCase()}">${last.rating}</span></div>`;
-    grid.appendChild(card);
+    const sc=avg(rep.entries), last=rep.entries[0];
+    const bc=sc>=80?'var(--awesome)':sc>=60?'var(--good)':sc>=35?'var(--mediocre)':'var(--poor)';
+    const d=document.createElement('div'); d.className='rep-card';
+    d.innerHTML=`<div class="rep-name">${rep.name}</div><div class="rep-market">${rep.market} · ${rep.entries.length} hrs · Score: <strong style="color:${bc}">${sc}</strong></div><div class="rep-score-bar"><div class="rep-score-fill" style="width:${sc}%;background:${bc}"></div></div><div class="rep-mini-stats"><div class="mini-stat" style="color:var(--awesome)">${c.Awesome}<div class="mini-label">🔥</div></div><div class="mini-stat" style="color:var(--good)">${c.Good}<div class="mini-label">👍</div></div><div class="mini-stat" style="color:var(--mediocre)">${c.Mediocre}<div class="mini-label">😐</div></div><div class="mini-stat" style="color:var(--poor)">${c.Poor}<div class="mini-label">📉</div></div></div><div class="rep-last"><strong>${last.hour_label}</strong> — ${last.activity.substring(0,80)}${last.activity.length>80?'…':''} <span class="entry-rating b-${last.rating.toLowerCase()}">${last.rating}</span></div>`;
+    grid.appendChild(d);
   });
 }
 
-function avgScore(entries) { return entries.length?Math.round(entries.reduce((s,e)=>s+(RATING_SCORES[e.rating]||0),0)/entries.length):0; }
+function avg(arr){return arr.length?Math.round(arr.reduce((s,e)=>s+(SCORES[e.rating]||0),0)/arr.length):0;}
 
-function subscribeRealtime() {
-  sb.channel('rf-hourly').on('postgres_changes',{event:'*',schema:'public',table:TABLE},(payload)=>{
+function subscribe() {
+  sb.channel('rf-log').on('postgres_changes',{event:'*',schema:'public',table:TABLE},(p)=>{
     const today=new Date().toISOString().split('T')[0];
-    if (payload.new?.date===today) {
-      if (payload.new?.rep_name===repName) loadTodayEntries();
-      if (!document.getElementById('view-team').classList.contains('hidden')) loadTeamData();
+    if(p.new?.date===today){
+      if(p.new?.rep_name===repName) loadEntries();
+      if(!document.getElementById('view-team').classList.contains('hidden')) loadTeam();
     }
   }).subscribe();
 }
 
-function showView(view) {
+function showView(v) {
   document.querySelectorAll('[id^="view-"]').forEach(el=>el.classList.add('hidden'));
-  document.getElementById('view-'+view).classList.remove('hidden');
+  document.getElementById('view-'+v).classList.remove('hidden');
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.nav-tab')[view==='log'?0:1].classList.add('active');
-  if (view==='team') loadTeamData();
+  document.querySelectorAll('.nav-tab')[v==='log'?0:1].classList.add('active');
+  if(v==='team') loadTeam();
 }
-<\/script>
+</script>
 </body>
 </html>
