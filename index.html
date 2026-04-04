@@ -12,120 +12,120 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-  header { background: var(--surface); border-bottom: 2px solid var(--accent); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .logo { font-weight: 900; font-size: 22px; letter-spacing: 1px; color: var(--accent); }
+  header { background: var(--surface); border-bottom: 2px solid var(--accent); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 8px; }
+  .logo { font-weight: 900; font-size: 20px; letter-spacing: 1px; color: var(--accent); }
   .logo span { color: var(--text); }
-  .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .nav-tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: 8px; padding: 4px; flex-wrap: wrap; }
-  .nav-tab { padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); border: none; background: transparent; }
+  .nav-tabs { display: flex; gap: 3px; background: var(--surface2); border-radius: 8px; padding: 3px; flex-wrap: wrap; }
+  .nav-tab { padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted); border: none; background: transparent; white-space: nowrap; }
   .nav-tab.active { background: var(--accent); color: #fff; }
-  .rep-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; white-space: nowrap; }
-  main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+  .rep-badge { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; white-space: nowrap; }
+  main { max-width: 960px; margin: 0 auto; padding: 20px 14px; }
 
-  /* MODAL */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 999; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 36px; width: min(460px, 92vw); text-align: center; }
-  .modal h2 { font-weight: 900; font-size: 28px; margin-bottom: 8px; color: var(--accent); }
-  .modal p { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
-  .modal input, .modal select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-size: 15px; margin-bottom: 12px; outline: none; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; z-index: 999; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; width: min(460px, 94vw); text-align: center; }
+  .modal h2 { font-weight: 900; font-size: 26px; margin-bottom: 6px; color: var(--accent); }
+  .modal p { color: var(--muted); margin-bottom: 18px; font-size: 13px; }
+  .modal input, .modal select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 13px; color: var(--text); font-size: 14px; margin-bottom: 10px; outline: none; }
   .modal select option { background: var(--surface2); }
-  .rep-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; max-height: 200px; overflow-y: auto; }
-  .rep-list-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; cursor: pointer; text-align: left; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .rep-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; max-height: 220px; overflow-y: auto; }
+  .rep-list-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; cursor: pointer; text-align: left; font-size: 14px; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s; }
   .rep-list-item:hover { border-color: var(--accent); }
-  .rep-list-item .rep-mkt { font-size: 11px; color: var(--muted); }
-  .divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; color: var(--muted); font-size: 12px; }
-  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .btn-primary { background: var(--accent); color: #fff; border: none; border-radius: 8px; width: 100%; padding: 14px; font-weight: 700; font-size: 17px; cursor: pointer; }
+  .rep-mkt { font-size: 11px; color: var(--muted); }
+  .divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: var(--muted); font-size: 11px; }
+  .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+  .btn-primary { background: var(--accent); color: #fff; border: none; border-radius: 8px; width: 100%; padding: 13px; font-weight: 700; font-size: 16px; cursor: pointer; }
 
-  /* LOG CARD */
-  .log-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
-  .log-card h3 { font-weight: 700; font-size: 20px; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .time-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 10px; font-size: 13px; font-weight: 600; color: var(--accent); }
-  .rating-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
-  .rating-btn { padding: 12px 8px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; font-weight: 700; font-size: 13px; text-align: center; background: var(--surface2); color: var(--muted); }
-  .rating-btn .icon { font-size: 18px; display: block; margin-bottom: 4px; }
+  .log-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 18px; }
+  .log-card h3 { font-weight: 700; font-size: 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .time-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; color: var(--accent); }
+  .date-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 10px; font-size: 12px; color: var(--muted); }
+  .rating-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin-bottom: 14px; }
+  .rating-btn { padding: 10px 6px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; font-weight: 700; font-size: 12px; text-align: center; background: var(--surface2); color: var(--muted); }
+  .rating-btn .icon { font-size: 17px; display: block; margin-bottom: 3px; }
   .sel-awesome { background: rgba(34,197,94,0.15); border-color: var(--awesome); color: var(--awesome); }
   .sel-good { background: rgba(59,130,246,0.15); border-color: var(--good); color: var(--good); }
   .sel-mediocre { background: rgba(245,158,11,0.15); border-color: var(--mediocre); color: var(--mediocre); }
   .sel-poor { background: rgba(239,68,68,0.15); border-color: var(--poor); color: var(--poor); }
-  .activity-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 16px; }
-  textarea { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: var(--text); font-size: 14px; resize: none; height: 80px; outline: none; }
+  .activity-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 14px; }
+  textarea { flex:1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 13px; color: var(--text); font-size: 13px; resize: none; height: 76px; outline: none; }
   textarea::placeholder { color: var(--muted); }
-  .mic-btn { width: 48px; height: 48px; border-radius: 12px; border: 2px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .mic-recording { border-color: var(--poor) !important; background: rgba(239,68,68,0.15) !important; color: var(--poor) !important; }
+  .mic-btn { width: 44px; height: 44px; border-radius: 10px; border: 2px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .mic-recording { border-color: var(--poor)!important; background: rgba(239,68,68,0.15)!important; color: var(--poor)!important; }
   .submit-row { display: flex; gap: 10px; align-items: center; }
-  .btn-submit { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 12px 28px; font-weight: 700; font-size: 16px; cursor: pointer; }
+  .btn-submit { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 11px 24px; font-weight: 700; font-size: 15px; cursor: pointer; }
   .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
   .save-status { font-size: 13px; color: var(--muted); }
-  .save-ok { color: var(--awesome) !important; }
+  .save-ok { color: var(--awesome)!important; }
 
-  /* HOUR PILLS */
-  .hour-selector { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
-  .hour-pill { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-weight: 600; font-size: 12px; cursor: pointer; }
-  .hour-active { background: var(--accent) !important; border-color: var(--accent) !important; color: #fff !important; }
-  .hour-logged { border-color: var(--good) !important; color: var(--good) !important; }
+  .hour-selector { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 16px; }
+  .hour-pill { padding: 5px 11px; border-radius: 18px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-weight: 600; font-size: 12px; cursor: pointer; }
+  .hour-active { background: var(--accent)!important; border-color: var(--accent)!important; color: #fff!important; }
+  .hour-logged { border-color: var(--good)!important; color: var(--good)!important; }
 
-  /* STATS */
-  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
-  .summary-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
-  .stat-box { background: var(--surface2); border-radius: 10px; padding: 12px; text-align: center; }
-  .stat-count { font-weight: 900; font-size: 30px; display: block; }
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+  .summary-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 12px; }
+  .stat-box { background: var(--surface2); border-radius: 10px; padding: 11px; text-align: center; }
+  .stat-count { font-weight: 900; font-size: 28px; display: block; }
   .stat-label { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
-  .perf-score { font-weight: 900; font-size: 48px; text-align: center; margin: 8px 0; }
-  .perf-label { text-align: center; font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .perf-score { font-weight: 900; font-size: 44px; text-align: center; margin: 8px 0; }
+  .perf-label { text-align: center; font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
 
-  /* ENTRIES */
-  .section-title { font-weight: 900; font-size: 20px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
-  .entry-list { display: flex; flex-direction: column; gap: 8px; }
-  .entry-item { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid; border-radius: 10px; padding: 12px 16px; display: flex; gap: 12px; }
-  .e-awesome { border-left-color: var(--awesome); }
-  .e-good { border-left-color: var(--good); }
-  .e-mediocre { border-left-color: var(--mediocre); }
-  .e-poor { border-left-color: var(--poor); }
-  .entry-time { font-weight: 700; font-size: 13px; color: var(--muted); white-space: nowrap; min-width: 70px; }
-  .entry-content { flex: 1; }
+  .section-title { font-weight: 900; font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .entry-list { display: flex; flex-direction: column; gap: 7px; }
+  .entry-item { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid; border-radius: 10px; padding: 11px 14px; display: flex; gap: 10px; }
+  .e-awesome { border-left-color: var(--awesome); } .e-good { border-left-color: var(--good); }
+  .e-mediocre { border-left-color: var(--mediocre); } .e-poor { border-left-color: var(--poor); }
+  .entry-time { font-weight: 700; font-size: 12px; color: var(--muted); white-space: nowrap; min-width: 65px; }
+  .entry-content { flex:1; }
   .entry-activity { font-size: 13px; line-height: 1.5; }
-  .entry-rating { font-weight: 700; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; margin-top: 4px; display: inline-block; }
+  .entry-rating { font-weight: 700; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; margin-top: 4px; display: inline-block; }
   .b-awesome { background: rgba(34,197,94,0.15); color: var(--awesome); }
   .b-good { background: rgba(59,130,246,0.15); color: var(--good); }
   .b-mediocre { background: rgba(245,158,11,0.15); color: var(--mediocre); }
   .b-poor { background: rgba(239,68,68,0.15); color: var(--poor); }
 
-  /* TEAM */
-  .period-tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: 8px; padding: 4px; margin-bottom: 20px; width: fit-content; }
-  .period-tab { padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); border: none; background: transparent; }
+  .period-tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: 8px; padding: 3px; margin-bottom: 16px; width: fit-content; flex-wrap: wrap; }
+  .period-tab { padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted); border: none; background: transparent; }
   .period-tab.active { background: var(--accent); color: #fff; }
-  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-  .rep-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
-  .rep-card-name { font-weight: 700; font-size: 17px; margin-bottom: 3px; }
-  .rep-card-meta { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(270px,1fr)); gap: 12px; }
+  .rep-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .rep-card-name { font-weight: 700; font-size: 16px; margin-bottom: 2px; }
+  .rep-card-meta { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
   .rep-score-bar { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
   .rep-score-fill { height: 100%; border-radius: 3px; }
-  .rep-mini-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-  .mini-stat { background: var(--surface2); border-radius: 6px; padding: 5px; text-align: center; font-weight: 700; font-size: 15px; }
-  .mini-label { font-size: 9px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
-  .rep-last { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .rep-mini-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
+  .mini-stat { background: var(--surface2); border-radius: 6px; padding: 5px; text-align: center; font-weight: 700; font-size: 14px; }
+  .mini-label { font-size: 8px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .rep-last { margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); }
   .rep-last strong { color: var(--text); font-size: 12px; }
 
   /* EOD */
-  .eod-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
-  .ai-summary { background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 14px 16px; font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
+  .eod-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 18px; }
+  .ai-summary { background: var(--surface2); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 14px 16px; font-size: 13px; line-height: 1.75; white-space: pre-wrap; }
 
-  /* MISC */
-  .empty { text-align: center; padding: 40px 20px; color: var(--muted); }
-  .empty .icon { font-size: 36px; margin-bottom: 10px; }
-  .hidden { display: none !important; }
+  /* HISTORY */
+  .history-filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .history-filters select { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; color: var(--text); font-size: 13px; outline: none; }
+  .summary-history-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .summary-history-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+  .summary-history-name { font-weight: 700; font-size: 15px; }
+  .summary-history-date { font-size: 12px; color: var(--muted); }
+  .summary-history-score { font-size: 13px; font-weight: 700; }
+  .summary-history-text { font-size: 13px; line-height: 1.65; color: var(--text); white-space: pre-wrap; border-left: 3px solid var(--accent); padding-left: 12px; margin-top: 8px; }
+  .summary-collapsed { max-height: 80px; overflow: hidden; position: relative; }
+  .summary-collapsed::after { content:''; position:absolute; bottom:0; left:0; right:0; height:30px; background:linear-gradient(transparent,var(--surface)); }
+  .expand-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 12px; font-weight: 600; margin-top: 6px; padding: 0; }
+
+  .empty { text-align: center; padding: 36px 20px; color: var(--muted); }
+  .empty .icon { font-size: 34px; margin-bottom: 10px; }
+  .hidden { display: none!important; }
   .dot-live { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--awesome); }
-  @media (max-width: 600px) {
-    .rating-row { grid-template-columns: repeat(2, 1fr); }
-    .summary-stats { grid-template-columns: repeat(2, 1fr); }
-    header { padding: 10px 14px; }
-  }
+  @media (max-width:600px) { .rating-row{grid-template-columns:repeat(2,1fr);} .summary-stats{grid-template-columns:repeat(2,1fr);} }
 </style>
 </head>
 <body>
 
-<!-- SETUP MODAL -->
+<!-- MODAL -->
 <div class="modal-overlay" id="setupModal">
   <div class="modal">
     <h2>RF DAILY TRACKER</h2>
@@ -135,12 +135,8 @@
     <input type="text" id="repNameInput" placeholder="Your Name">
     <select id="repMarketInput">
       <option value="">Select Market</option>
-      <option>Kansas City</option>
-      <option>St. Louis</option>
-      <option>Joplin</option>
-      <option>Fort Smith</option>
-      <option>Mena</option>
-      <option>Wichita</option>
+      <option>Kansas City</option><option>St. Louis</option><option>Joplin</option>
+      <option>Fort Smith</option><option>Mena</option><option>Wichita</option>
     </select>
     <button class="btn-primary" onclick="startSession()">Start My Day →</button>
   </div>
@@ -148,20 +144,22 @@
 
 <header>
   <div class="logo">RF<span> DAILY</span></div>
-  <div class="header-right">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showView('log')">My Log</button>
-      <button class="nav-tab" onclick="showView('team')">Team <span class="dot-live" style="margin-left:4px"></span></button>
+      <button class="nav-tab" onclick="showView('team')">Team <span class="dot-live" style="margin-left:3px"></span></button>
+      <button class="nav-tab" onclick="showView('history')">Summaries</button>
     </div>
-    <div class="rep-badge" onclick="changeRep()" id="repBadgeBtn" title="Click to switch rep">—</div>
+    <div class="rep-badge" onclick="changeRep()" id="repBadgeBtn">—</div>
   </div>
 </header>
 
 <main>
+
   <!-- MY LOG -->
   <div id="view-log">
     <div class="log-card">
-      <h3>Log This Hour <span class="time-chip" id="currentTimeChip">—</span></h3>
+      <h3>Log This Hour <span class="time-chip" id="currentTimeChip">—</span> <span class="date-chip" id="currentDateChip">—</span></h3>
       <div class="hour-selector" id="hourSelector"></div>
       <div class="rating-row">
         <button class="rating-btn" data-rating="Awesome" onclick="selectRating(this)"><span class="icon">🔥</span>AWESOME</button>
@@ -170,7 +168,7 @@
         <button class="rating-btn" data-rating="Poor" onclick="selectRating(this)"><span class="icon">📉</span>POOR</button>
       </div>
       <div class="activity-row">
-        <textarea id="activityText" placeholder="What did you do this hour? (type or tap mic to speak)"></textarea>
+        <textarea id="activityText" placeholder="What did you do this hour? (type or tap mic)"></textarea>
         <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
       </div>
       <div class="submit-row">
@@ -181,26 +179,26 @@
 
     <div class="summary-card">
       <div class="section-title">Today's Performance</div>
-      <div style="display:flex;align-items:center;gap:20px;">
+      <div style="display:flex;align-items:center;gap:16px;">
         <div style="flex:1">
           <div class="perf-score" id="perfScore" style="color:var(--accent)">—</div>
           <div class="perf-label">Score</div>
         </div>
         <div class="summary-stats" style="flex:3">
-          <div class="stat-box"><span class="stat-count" style="color:var(--awesome)" id="countAwesome">0</span><div class="stat-label">Awesome</div></div>
-          <div class="stat-box"><span class="stat-count" style="color:var(--good)" id="countGood">0</span><div class="stat-label">Good</div></div>
-          <div class="stat-box"><span class="stat-count" style="color:var(--mediocre)" id="countMediocre">0</span><div class="stat-label">Mediocre</div></div>
-          <div class="stat-box"><span class="stat-count" style="color:var(--poor)" id="countPoor">0</span><div class="stat-label">Poor</div></div>
+          <div class="stat-box"><span class="stat-count" style="color:var(--awesome)" id="cA">0</span><div class="stat-label">Awesome</div></div>
+          <div class="stat-box"><span class="stat-count" style="color:var(--good)" id="cG">0</span><div class="stat-label">Good</div></div>
+          <div class="stat-box"><span class="stat-count" style="color:var(--mediocre)" id="cM">0</span><div class="stat-label">Mediocre</div></div>
+          <div class="stat-box"><span class="stat-count" style="color:var(--poor)" id="cP">0</span><div class="stat-label">Poor</div></div>
         </div>
       </div>
     </div>
 
-    <div style="text-align:center;margin-bottom:20px;">
-      <button class="btn-submit" onclick="generateEOD()" id="eodBtn" style="background:var(--surface);border:2px solid var(--accent);color:var(--accent)">✨ End-of-Day Summary</button>
+    <div style="text-align:center;margin-bottom:18px;">
+      <button class="btn-submit" onclick="generateEOD()" id="eodBtn" style="background:var(--surface);border:2px solid var(--accent);color:var(--accent)">✨ Generate & Save End-of-Day Summary</button>
     </div>
 
     <div class="eod-card hidden" id="eodCard">
-      <div class="section-title">📋 End-of-Day Summary</div>
+      <div class="section-title">📋 Today's Summary</div>
       <div class="ai-summary" id="eodContent"></div>
     </div>
 
@@ -210,11 +208,11 @@
     </div>
   </div>
 
-  <!-- TEAM VIEW -->
+  <!-- TEAM -->
   <div id="view-team" class="hidden">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
       <div class="section-title" style="margin-bottom:0">Team Dashboard <span class="dot-live"></span></div>
-      <div style="font-size:13px;color:var(--muted)" id="teamDate"></div>
+      <div style="font-size:12px;color:var(--muted)" id="teamDate"></div>
     </div>
     <div class="period-tabs">
       <button class="period-tab active" onclick="setPeriod('today',this)">Today</button>
@@ -226,6 +224,24 @@
       <div class="empty" style="grid-column:1/-1"><div class="icon">👥</div><p>Loading…</p></div>
     </div>
   </div>
+
+  <!-- SUMMARY HISTORY -->
+  <div id="view-history" class="hidden">
+    <div class="section-title">📋 EOD Summary History</div>
+    <div class="history-filters">
+      <select id="historyRep" onchange="loadHistory()"><option value="">All Reps</option></select>
+      <select id="historyPeriod" onchange="loadHistory()">
+        <option value="7">Last 7 Days</option>
+        <option value="14">Last 14 Days</option>
+        <option value="30">Last 30 Days</option>
+        <option value="90">Last 90 Days</option>
+      </select>
+    </div>
+    <div id="historyList">
+      <div class="empty"><div class="icon">📋</div><p>Loading summaries…</p></div>
+    </div>
+  </div>
+
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -234,22 +250,26 @@ const SUPABASE_URL = 'https://inwtlvzkwaslofqfrlpc.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlud3Rsdnprd2FzbG9mcWZybHBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzI2NDcsImV4cCI6MjA4ODMwODY0N30.bpjIExAjKo54a4X8QqgR2gn6LpVseEYopXk2RGQdQrE';
 const TABLE = 'rf_hourly_log';
 const REPS_TABLE = 'rf_reps';
+const EOD_TABLE = 'rf_eod_summaries';
 const HOURS = ['7 AM','8 AM','9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM','4 PM','5 PM','6 PM','7 PM','8 PM','9 PM','10 PM'];
 const SCORES = { Awesome:100, Good:75, Mediocre:40, Poor:10 };
 
 let sb, repName, repMarket, selectedRating=null, selectedHour=null, recognition, isRecording=false, entries=[], currentPeriod='today';
 
+// Get LOCAL date string (fixes timezone bug)
+function localDateStr(d) {
+  const dt = d || new Date();
+  return dt.getFullYear()+'-'+(dt.getMonth()+1+'').padStart(2,'0')+'-'+(dt.getDate()+'').padStart(2,'0');
+}
+
 window.onload = async function() {
-  try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } 
-  catch(e) { alert('Failed to connect: '+e.message); return; }
-
-  // Load known reps for quick login
+  try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+  catch(e) { alert('Connection failed: '+e.message); return; }
   await loadKnownReps();
-
   repName = localStorage.getItem('rf_rep_name');
   repMarket = localStorage.getItem('rf_rep_market');
   if (repName && repMarket) {
-    document.getElementById('setupModal').style.display = 'none';
+    document.getElementById('setupModal').style.display='none';
     initApp();
   }
   updateClock();
@@ -260,84 +280,68 @@ async function loadKnownReps() {
   try {
     const {data} = await sb.from(REPS_TABLE).select('*').order('rep_name');
     const list = document.getElementById('knownRepsList');
-    const divider = document.getElementById('orDivider');
-    if (!data || !data.length) { list.style.display='none'; divider.style.display='none'; return; }
-    list.innerHTML = data.map(r => `
-      <div class="rep-list-item" onclick="quickLogin('${r.rep_name}','${r.market}')">
-        <span>${r.rep_name}</span>
-        <span class="rep-mkt">${r.market}</span>
-      </div>`).join('');
-  } catch(e) { console.log('Reps table not ready yet'); }
+    const div = document.getElementById('orDivider');
+    if (!data||!data.length){list.style.display='none';div.style.display='none';return;}
+    list.innerHTML = data.map(r=>`<div class="rep-list-item" onclick="quickLogin('${r.rep_name.replace(/'/g,"\\'")}','${r.market.replace(/'/g,"\\'")}')"><span>${r.rep_name}</span><span class="rep-mkt">${r.market}</span></div>`).join('');
+  } catch(e) { console.log('Reps table not ready'); }
 }
 
-function quickLogin(name, market) {
-  repName = name; repMarket = market;
-  localStorage.setItem('rf_rep_name', name);
-  localStorage.setItem('rf_rep_market', market);
-  document.getElementById('setupModal').style.display = 'none';
+function quickLogin(name,market) {
+  repName=name; repMarket=market;
+  localStorage.setItem('rf_rep_name',name);
+  localStorage.setItem('rf_rep_market',market);
+  document.getElementById('setupModal').style.display='none';
   initApp();
 }
 
 async function startSession() {
-  const n = document.getElementById('repNameInput').value.trim();
-  const m = document.getElementById('repMarketInput').value;
-  if (!n || !m) { alert('Enter your name and select a market.'); return; }
-  repName = n; repMarket = m;
-  localStorage.setItem('rf_rep_name', n);
-  localStorage.setItem('rf_rep_market', m);
-  // Save to reps table
-  try {
-    await sb.from(REPS_TABLE).upsert({rep_name:n, market:m, last_active:new Date().toISOString()},{onConflict:'rep_name'});
-  } catch(e) { console.log('Could not save rep',e); }
-  document.getElementById('setupModal').style.display = 'none';
+  const n=document.getElementById('repNameInput').value.trim();
+  const m=document.getElementById('repMarketInput').value;
+  if(!n||!m){alert('Enter your name and market.');return;}
+  repName=n; repMarket=m;
+  localStorage.setItem('rf_rep_name',n);
+  localStorage.setItem('rf_rep_market',m);
+  try { await sb.from(REPS_TABLE).upsert({rep_name:n,market:m,last_active:new Date().toISOString()},{onConflict:'rep_name'}); } catch(e){}
+  document.getElementById('setupModal').style.display='none';
   initApp();
 }
 
-function changeRep() {
-  localStorage.removeItem('rf_rep_name');
-  localStorage.removeItem('rf_rep_market');
-  location.reload();
-}
+function changeRep() { localStorage.removeItem('rf_rep_name'); localStorage.removeItem('rf_rep_market'); location.reload(); }
 
 function initApp() {
-  document.getElementById('repBadgeBtn').textContent = repName + ' ↕';
+  document.getElementById('repBadgeBtn').textContent = repName+' ↕';
   buildHours();
   loadEntries();
   subscribe();
-  // Update last active
   try { sb.from(REPS_TABLE).upsert({rep_name:repName,market:repMarket,last_active:new Date().toISOString()},{onConflict:'rep_name'}).then(()=>{}); } catch(e){}
 }
 
 function buildHours() {
-  const c = document.getElementById('hourSelector');
-  const cur = hourLabel(new Date().getHours());
-  c.innerHTML = '';
-  HOURS.forEach(h => {
-    const b = document.createElement('button');
-    b.className = 'hour-pill' + (h===cur?' hour-active':'');
-    b.textContent = h; b.dataset.hour = h;
-    b.onclick = () => { document.querySelectorAll('.hour-pill').forEach(p=>{p.classList.remove('hour-active');}); b.classList.add('hour-active'); selectedHour=h; };
+  const c=document.getElementById('hourSelector');
+  const cur=hourLabel(new Date().getHours());
+  c.innerHTML='';
+  HOURS.forEach(h=>{
+    const b=document.createElement('button');
+    b.className='hour-pill'+(h===cur?' hour-active':'');
+    b.textContent=h; b.dataset.hour=h;
+    b.onclick=()=>{document.querySelectorAll('.hour-pill').forEach(p=>p.classList.remove('hour-active'));b.classList.add('hour-active');selectedHour=h;};
     c.appendChild(b);
   });
-  selectedHour = cur;
+  selectedHour=cur;
 }
 
-function hourLabel(h) {
-  if(h===0) return '12 AM'; if(h<12) return h+' AM'; if(h===12) return '12 PM'; return (h-12)+' PM';
-}
-
-function markLogged(h) {
-  document.querySelectorAll('.hour-pill').forEach(p => { if(p.dataset.hour===h){ p.classList.add('hour-logged'); } });
-}
+function hourLabel(h){if(h===0)return'12 AM';if(h<12)return h+' AM';if(h===12)return'12 PM';return(h-12)+' PM';}
+function markLogged(h){document.querySelectorAll('.hour-pill').forEach(p=>{if(p.dataset.hour===h)p.classList.add('hour-logged');});}
 
 function updateClock() {
-  const n=new Date(), h=n.getHours(), m=n.getMinutes();
-  document.getElementById('currentTimeChip').textContent = (h%12||12)+':'+(m+'').padStart(2,'0')+' '+(h>=12?'PM':'AM');
+  const n=new Date(),h=n.getHours(),m=n.getMinutes();
+  document.getElementById('currentTimeChip').textContent=(h%12||12)+':'+(m+'').padStart(2,'0')+' '+(h>=12?'PM':'AM');
+  document.getElementById('currentDateChip').textContent=n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 }
 
 function selectRating(btn) {
-  document.querySelectorAll('.rating-btn').forEach(b=>{b.className='rating-btn';});
-  selectedRating = btn.dataset.rating;
+  document.querySelectorAll('.rating-btn').forEach(b=>b.className='rating-btn');
+  selectedRating=btn.dataset.rating;
   btn.classList.add('sel-'+selectedRating.toLowerCase());
 }
 
@@ -354,15 +358,15 @@ function toggleMic() {
 }
 
 async function saveEntry() {
-  const act = document.getElementById('activityText').value.trim();
+  const act=document.getElementById('activityText').value.trim();
   if(!selectedRating){alert('Select a rating first.');return;}
   if(!act){alert('Describe what you did this hour.');return;}
   const btn=document.getElementById('saveBtn');
   btn.disabled=true; btn.textContent='Saving…';
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDateStr(); // LOCAL date
   const {error}=await sb.from(TABLE).upsert({
-    rep_name:repName, market:repMarket, date:today,
-    hour_label:selectedHour, activity:act, rating:selectedRating,
+    rep_name:repName,market:repMarket,date:today,
+    hour_label:selectedHour,activity:act,rating:selectedRating,
     created_at:new Date().toISOString()
   },{onConflict:'rep_name,date,hour_label'});
   btn.disabled=false; btn.textContent='Save Hour';
@@ -377,9 +381,9 @@ async function saveEntry() {
 }
 
 async function loadEntries() {
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDateStr(); // LOCAL date
   const {data,error}=await sb.from(TABLE).select('*').eq('rep_name',repName).eq('date',today).order('created_at');
-  if(error){console.error(error);return;}
+  if(error){console.error('Load error:',error);return;}
   entries=data||[];
   renderEntries();
   updateStats();
@@ -394,138 +398,159 @@ function renderEntries() {
 }
 
 function updateStats() {
-  const c={Awesome:0,Good:0,Mediocre:0,Poor:0}; let tot=0;
+  const c={Awesome:0,Good:0,Mediocre:0,Poor:0};let tot=0;
   entries.forEach(e=>{c[e.rating]=(c[e.rating]||0)+1;tot+=SCORES[e.rating]||0;});
-  document.getElementById('countAwesome').textContent=c.Awesome;
-  document.getElementById('countGood').textContent=c.Good;
-  document.getElementById('countMediocre').textContent=c.Mediocre;
-  document.getElementById('countPoor').textContent=c.Poor;
-  const n=entries.length, avg=n?Math.round(tot/n):0;
+  document.getElementById('cA').textContent=c.Awesome;
+  document.getElementById('cG').textContent=c.Good;
+  document.getElementById('cM').textContent=c.Mediocre;
+  document.getElementById('cP').textContent=c.Poor;
+  const n=entries.length,av=n?Math.round(tot/n):0;
   const el=document.getElementById('perfScore');
-  el.textContent=n?avg:'—';
-  el.style.color=avg>=80?'var(--awesome)':avg>=60?'var(--good)':avg>=35?'var(--mediocre)':n?'var(--poor)':'var(--accent)';
+  el.textContent=n?av:'—';
+  el.style.color=av>=80?'var(--awesome)':av>=60?'var(--good)':av>=35?'var(--mediocre)':n?'var(--poor)':'var(--accent)';
 }
 
-// ── EOD SUMMARY (calls Supabase Edge Function as proxy) ──
+// ── EOD SUMMARY ──
 async function generateEOD() {
   if(!entries.length){alert('Log some hours first!');return;}
   document.getElementById('eodCard').classList.remove('hidden');
-  const eodContent = document.getElementById('eodContent');
+  const eodContent=document.getElementById('eodContent');
   eodContent.textContent='Generating your summary…';
   document.getElementById('eodBtn').disabled=true;
 
-  const sum=entries.map(e=>`${e.hour_label}: [${e.rating}] ${e.activity}`).join('\n');
-  const c={Awesome:0,Good:0,Mediocre:0,Poor:0}; entries.forEach(e=>c[e.rating]=(c[e.rating]||0)+1);
-  const prompt=`You are a roofing sales performance coach. Rep: ${repName}, Market: ${repMarket}.\n\nToday's hourly log:\n${sum}\n\nRatings breakdown: ${c.Awesome} Awesome, ${c.Good} Good, ${c.Mediocre} Mediocre, ${c.Poor} Poor hours.\n\nWrite a direct, motivating end-of-day summary in 3-5 paragraphs:\n1. Call out what went well (specific hours)\n2. Flag patterns in lower-performing hours\n3. Give 2-3 actionable coaching tips for tomorrow\n4. End with a punchy one-liner to close strong\n\nTone: direct, real, hard-charging sales team. No fluff.`;
+  const c={Awesome:0,Good:0,Mediocre:0,Poor:0};
+  entries.forEach(e=>c[e.rating]=(c[e.rating]||0)+1);
+  const avScore=avg(entries);
+  const sorted=[...entries].sort((a,b)=>HOURS.indexOf(a.hour_label)-HOURS.indexOf(b.hour_label));
+  const sum=sorted.map(e=>`${e.hour_label}: [${e.rating}] ${e.activity}`).join('\n');
 
+  // Build local summary (always works, no API needed)
+  const best=sorted.filter(e=>e.rating==='Awesome').map(e=>e.hour_label);
+  const poor=sorted.filter(e=>e.rating==='Poor').map(e=>e.hour_label);
+  const mediocre=sorted.filter(e=>e.rating==='Mediocre').map(e=>e.hour_label);
+
+  let summaryText = `${repName} — ${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}\nMarket: ${repMarket} | Score: ${avScore}/100 | Hours Logged: ${entries.length}\n\n`;
+
+  if(best.length) summaryText+=`🔥 Strong hours: ${best.join(', ')}\n`;
+  if(poor.length) summaryText+=`📉 Weak hours: ${poor.join(', ')}\n`;
+  if(mediocre.length) summaryText+=`😐 Mediocre hours: ${mediocre.join(', ')}\n`;
+  summaryText+='\n';
+
+  summaryText+='Hour-by-Hour:\n'+sum+'\n\n';
+
+  if(avScore>=80) summaryText+='Outstanding day — you were locked in and productive. Carry this energy into tomorrow and push for back-to-back strong days.';
+  else if(avScore>=65) summaryText+='Solid day overall. A few hours dipped but you kept it together. Tomorrow, focus on turning those Mediocre blocks into Good or Awesome.';
+  else if(avScore>=45) summaryText+='Mixed day. You had moments but too many hours were left on the table. Identify what pulled you off track in the low hours and eliminate it tomorrow.';
+  else summaryText+='Tough day — it happens. Reset tonight, come in early, attack the first hour hard, and build momentum from there. You\'ve got tomorrow.';
+
+  eodContent.textContent=summaryText;
+
+  // Save to Supabase
   try {
-    // Try Supabase Edge Function proxy first
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/claude-proxy`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify({ prompt })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      eodContent.textContent = data.text || 'No summary returned.';
-    } else {
-      // Fallback: generate locally without API
-      eodContent.textContent = generateLocalSummary(c, entries);
-    }
-  } catch(e) {
-    eodContent.textContent = generateLocalSummary(c, entries);
-  }
+    const today=localDateStr();
+    await sb.from(EOD_TABLE).upsert({
+      rep_name:repName, market:repMarket, date:today,
+      summary_text:summaryText, score:avScore,
+      awesome_count:c.Awesome, good_count:c.Good,
+      mediocre_count:c.Mediocre, poor_count:c.Poor,
+      hours_logged:entries.length,
+      created_at:new Date().toISOString()
+    },{onConflict:'rep_name,date'});
+  } catch(e){console.log('Could not save EOD',e);}
+
   document.getElementById('eodBtn').disabled=false;
 }
 
-function generateLocalSummary(c, entries) {
-  const total = entries.length;
-  const avgSc = avg(entries);
-  const sorted = [...entries].sort((a,b)=>HOURS.indexOf(a.hour_label)-HOURS.indexOf(b.hour_label));
-  const best = sorted.filter(e=>e.rating==='Awesome').map(e=>e.hour_label).join(', ') || 'none';
-  const worst = sorted.filter(e=>e.rating==='Poor').map(e=>e.hour_label).join(', ') || 'none';
-  return `${repName} — ${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}\n\nYou logged ${total} hours today with an average score of ${avgSc}/100.\n\nStrong hours: ${best}\nHours to improve: ${worst}\n\nRating breakdown: ${c.Awesome} Awesome 🔥 | ${c.Good} Good 👍 | ${c.Mediocre} Mediocre 😐 | ${c.Poor} Poor 📉\n\n${avgSc >= 75 ? 'Solid day — keep that energy going tomorrow.' : avgSc >= 50 ? 'Decent effort — tighten up the slow hours tomorrow and push for more Awesome blocks.' : 'Tough day — reset tonight, come in sharp tomorrow and attack the first hour hard.'}`;
-}
-
-// ── TEAM VIEW ──
-function setPeriod(p, btn) {
-  currentPeriod = p;
+// ── TEAM ──
+function setPeriod(p,btn){
+  currentPeriod=p;
   document.querySelectorAll('.period-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   loadTeam();
 }
 
-function getDateRange(period) {
-  const now = new Date();
-  const today = now.toISOString().split('T')[0];
-  if (period === 'today') return { start: today, end: today };
-  if (period === 'wtd') {
-    const day = now.getDay(); // 0=Sun
-    const diff = day === 0 ? 6 : day - 1; // Mon start
-    const mon = new Date(now); mon.setDate(now.getDate()-diff);
-    return { start: mon.toISOString().split('T')[0], end: today };
-  }
-  if (period === 'week') {
-    const wk = new Date(now); wk.setDate(now.getDate()-6);
-    return { start: wk.toISOString().split('T')[0], end: today };
-  }
-  if (period === 'month') {
-    const mo = new Date(now.getFullYear(), now.getMonth(), 1);
-    return { start: mo.toISOString().split('T')[0], end: today };
-  }
-  return { start: today, end: today };
+function getDateRange(period){
+  const now=new Date(), today=localDateStr();
+  if(period==='today') return{start:today,end:today};
+  if(period==='wtd'){const day=now.getDay(),diff=day===0?6:day-1,mon=new Date(now);mon.setDate(now.getDate()-diff);return{start:localDateStr(mon),end:today};}
+  if(period==='week'){const wk=new Date(now);wk.setDate(now.getDate()-6);return{start:localDateStr(wk),end:today};}
+  if(period==='month'){const mo=new Date(now.getFullYear(),now.getMonth(),1);return{start:localDateStr(mo),end:today};}
+  return{start:today,end:today};
 }
 
-async function loadTeam() {
-  const {start, end} = getDateRange(currentPeriod);
-  const labels = {today:'Today', wtd:'Week to Date', week:'Last 7 Days', month:'This Month'};
-  document.getElementById('teamDate').textContent = labels[currentPeriod] + ' · ' + new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
-
-  const {data} = await sb.from(TABLE).select('*').gte('date',start).lte('date',end).order('created_at',{ascending:false});
-  const grid = document.getElementById('teamGrid');
-
-  if(!data||!data.length){
-    grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="icon">👥</div><p>No activity in this period yet.</p></div>';
-    return;
-  }
-
+async function loadTeam(){
+  const{start,end}=getDateRange(currentPeriod);
+  const labels={today:'Today',wtd:'Week to Date',week:'Last 7 Days',month:'This Month'};
+  document.getElementById('teamDate').textContent=labels[currentPeriod]+' · '+new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const{data}=await sb.from(TABLE).select('*').gte('date',start).lte('date',end).order('created_at',{ascending:false});
+  const grid=document.getElementById('teamGrid');
+  if(!data||!data.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="icon">👥</div><p>No activity in this period.</p></div>';return;}
   const reps={};
-  data.forEach(e=>{
-    if(!reps[e.rep_name]) reps[e.rep_name]={name:e.rep_name,market:e.market,entries:[]};
-    reps[e.rep_name].entries.push(e);
-  });
-
+  data.forEach(e=>{if(!reps[e.rep_name])reps[e.rep_name]={name:e.rep_name,market:e.market,entries:[]};reps[e.rep_name].entries.push(e);});
   grid.innerHTML='';
   Object.values(reps).sort((a,b)=>avg(b.entries)-avg(a.entries)).forEach(rep=>{
-    const c={Awesome:0,Good:0,Mediocre:0,Poor:0};
-    rep.entries.forEach(e=>c[e.rating]=(c[e.rating]||0)+1);
-    const sc=avg(rep.entries), last=rep.entries[0];
+    const c={Awesome:0,Good:0,Mediocre:0,Poor:0};rep.entries.forEach(e=>c[e.rating]=(c[e.rating]||0)+1);
+    const sc=avg(rep.entries),last=rep.entries[0];
     const bc=sc>=80?'var(--awesome)':sc>=60?'var(--good)':sc>=35?'var(--mediocre)':'var(--poor)';
-    const days = currentPeriod==='today' ? '' : ` · ${new Set(rep.entries.map(e=>e.date)).size}d`;
-    const d=document.createElement('div'); d.className='rep-card';
-    d.innerHTML=`
-      <div class="rep-card-name">${rep.name}</div>
-      <div class="rep-card-meta">${rep.market} · ${rep.entries.length} hrs${days} · Score: <strong style="color:${bc}">${sc}</strong></div>
-      <div class="rep-score-bar"><div class="rep-score-fill" style="width:${sc}%;background:${bc}"></div></div>
-      <div class="rep-mini-stats">
-        <div class="mini-stat" style="color:var(--awesome)">${c.Awesome}<div class="mini-label">🔥</div></div>
-        <div class="mini-stat" style="color:var(--good)">${c.Good}<div class="mini-label">👍</div></div>
-        <div class="mini-stat" style="color:var(--mediocre)">${c.Mediocre}<div class="mini-label">😐</div></div>
-        <div class="mini-stat" style="color:var(--poor)">${c.Poor}<div class="mini-label">📉</div></div>
-      </div>
-      <div class="rep-last"><strong>${last.hour_label} ${last.date!==new Date().toISOString().split('T')[0]?'('+last.date+')':''}</strong> — ${last.activity.substring(0,70)}${last.activity.length>70?'…':''} <span class="entry-rating b-${last.rating.toLowerCase()}">${last.rating}</span></div>`;
+    const days=currentPeriod==='today'?'':` · ${new Set(rep.entries.map(e=>e.date)).size}d`;
+    const d=document.createElement('div');d.className='rep-card';
+    d.innerHTML=`<div class="rep-card-name">${rep.name}</div><div class="rep-card-meta">${rep.market} · ${rep.entries.length} hrs${days} · Score: <strong style="color:${bc}">${sc}</strong></div><div class="rep-score-bar"><div class="rep-score-fill" style="width:${sc}%;background:${bc}"></div></div><div class="rep-mini-stats"><div class="mini-stat" style="color:var(--awesome)">${c.Awesome}<div class="mini-label">🔥</div></div><div class="mini-stat" style="color:var(--good)">${c.Good}<div class="mini-label">👍</div></div><div class="mini-stat" style="color:var(--mediocre)">${c.Mediocre}<div class="mini-label">😐</div></div><div class="mini-stat" style="color:var(--poor)">${c.Poor}<div class="mini-label">📉</div></div></div><div class="rep-last"><strong>${last.hour_label}${last.date!==localDateStr()?' ('+last.date+')':''}</strong> — ${last.activity.substring(0,65)}${last.activity.length>65?'…':''} <span class="entry-rating b-${last.rating.toLowerCase()}">${last.rating}</span></div>`;
     grid.appendChild(d);
   });
 }
 
+// ── HISTORY ──
+async function loadHistory(){
+  const repFilter=document.getElementById('historyRep').value;
+  const days=parseInt(document.getElementById('historyPeriod').value)||7;
+  const since=new Date();since.setDate(since.getDate()-days);
+  const sinceStr=localDateStr(since);
+
+  let q=sb.from(EOD_TABLE).select('*').gte('date',sinceStr).order('date',{ascending:false}).order('rep_name');
+  if(repFilter) q=q.eq('rep_name',repFilter);
+  const{data}=await q;
+  const list=document.getElementById('historyList');
+  if(!data||!data.length){list.innerHTML='<div class="empty"><div class="icon">📋</div><p>No summaries in this period yet.</p></div>';return;}
+  list.innerHTML=data.map((s,i)=>{
+    const sc=s.score||0;
+    const bc=sc>=80?'var(--awesome)':sc>=60?'var(--good)':sc>=35?'var(--mediocre)':'var(--poor)';
+    const dateLabel=new Date(s.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    return `<div class="summary-history-item">
+      <div class="summary-history-header">
+        <div><div class="summary-history-name">${s.rep_name}</div><div style="font-size:11px;color:var(--muted)">${s.market}</div></div>
+        <div style="text-align:right"><div class="summary-history-date">${dateLabel}</div><div class="summary-history-score" style="color:${bc}">${sc}/100 · ${s.hours_logged||0} hrs</div></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <span class="entry-rating b-awesome">${s.awesome_count||0} 🔥</span>
+        <span class="entry-rating b-good">${s.good_count||0} 👍</span>
+        <span class="entry-rating b-mediocre">${s.mediocre_count||0} 😐</span>
+        <span class="entry-rating b-poor">${s.poor_count||0} 📉</span>
+      </div>
+      <div class="summary-history-text summary-collapsed" id="sum-${i}">${s.summary_text||''}</div>
+      <button class="expand-btn" onclick="toggleExpand('sum-${i}',this)">Show full summary ▼</button>
+    </div>`;
+  }).join('');
+}
+
+function toggleExpand(id,btn){
+  const el=document.getElementById(id);
+  if(el.classList.contains('summary-collapsed')){el.classList.remove('summary-collapsed');btn.textContent='Hide ▲';}
+  else{el.classList.add('summary-collapsed');btn.textContent='Show full summary ▼';}
+}
+
+async function populateHistoryRepFilter(){
+  try{
+    const{data}=await sb.from(REPS_TABLE).select('rep_name').order('rep_name');
+    const sel=document.getElementById('historyRep');
+    if(data) data.forEach(r=>{const o=document.createElement('option');o.value=r.rep_name;o.textContent=r.rep_name;sel.appendChild(o);});
+  }catch(e){}
+}
+
 function avg(arr){return arr.length?Math.round(arr.reduce((s,e)=>s+(SCORES[e.rating]||0),0)/arr.length):0;}
 
-function subscribe() {
+function subscribe(){
   sb.channel('rf-log').on('postgres_changes',{event:'*',schema:'public',table:TABLE},(p)=>{
-    const today=new Date().toISOString().split('T')[0];
+    const today=localDateStr();
     if(p.new?.date===today){
       if(p.new?.rep_name===repName) loadEntries();
       if(!document.getElementById('view-team').classList.contains('hidden')) loadTeam();
@@ -533,12 +558,14 @@ function subscribe() {
   }).subscribe();
 }
 
-function showView(v) {
+function showView(v){
   document.querySelectorAll('[id^="view-"]').forEach(el=>el.classList.add('hidden'));
   document.getElementById('view-'+v).classList.remove('hidden');
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.nav-tab')[v==='log'?0:1].classList.add('active');
+  const idx={log:0,team:1,history:2}[v];
+  document.querySelectorAll('.nav-tab')[idx].classList.add('active');
   if(v==='team') loadTeam();
+  if(v==='history'){populateHistoryRepFilter();loadHistory();}
 }
 </script>
 </body>
