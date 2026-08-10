@@ -3,20 +3,25 @@
 This documents the exact EaveSide fields the skill relies on, so a run trusts
 the right field instead of guessing. All shapes below are from live data.
 
-## Job statuses (from `job_status_summary`)
+## The funnel: `ar_aging_report()` IS the receivable
 
-| status | meaning | relevant? |
+For the full-AR follow-up, `ar_aging_report()` is the primary and authoritative
+source: one call returns every outstanding invoice, and `summary.grand_total`
+equals the AR figure on the EaveSide screen. Enrich each invoice with one
+`get_job(job_id)` for the rep and details. Do not try to scan `job_completed`
+(thousands of rows, `list_jobs` caps at 50) — the aging report already contains
+every job that owes money, whatever its status.
+
+## Job statuses (from `job_status_summary`) — for context
+
+| status | meaning | shows in AR? |
 |--------|---------|-----------|
 | `new_lead` | unconverted lead | no |
-| `proposal_signed` | sold, not built | no |
-| `production` | install in progress / just done | maybe (recently wrapped) |
-| `payments_invoicing` | **billing & collection stage** | **yes — primary funnel** |
-| `job_completed` | done (usually already paid/closed) | only if uncollected |
-| `cancelled` / `lost` | dead | exclude |
-
-There are thousands of `job_completed` rows going back years, and `list_jobs`
-caps at 50 with no date filter — do NOT scan them all. Funnel via
-`payments_invoicing` + `ar_aging_report` instead.
+| `proposal_signed` | sold, not built | only if invoiced early → **Review** |
+| `production` | install in progress / just done | if invoiced |
+| `payments_invoicing` | **billing & collection stage** | yes — most AR lives here |
+| `job_completed` | done (usually already paid/closed) | only the rare unpaid one |
+| `cancelled` / `lost` | dead | if still invoiced → **Review/Excluded** |
 
 ## `get_job(id)` — fields that matter
 
@@ -71,17 +76,22 @@ Trust `work_type`.
 }
 ```
 
-Decision table for a given job:
+You usually don't need this per invoice — the aging report already gives
+`balance_due` and `total`, and **collected = total − balance_due**. Call
+`get_job_financials` only when an invoice looks off and you want to confirm.
 
-| collected_total | balance_due | bucket |
+Categorization decision table (per outstanding invoice):
+
+| balance_due vs total | job status | category |
 |-----------------|-------------|--------|
-| `0` | `> 0` | **PRIMARY alert** — nothing collected |
-| `0` | `0` & invoiced_total `0` | **PRIMARY alert** — not even invoiced yet |
-| `> 0` | `> 0` | secondary — "partial, still owed" |
-| `> 0` | `0` | done, paid — ignore |
+| `balance_due == total` (≥ total − $1) | active | **Nothing collected** (urgent if installed 2+ days) |
+| `0 < balance_due < total` | active | **Partial — balance remains** |
+| any balance | `cancelled` / `lost` | **Review/Excluded** — void or write off |
+| balance, `installed_at` null | `proposal_signed` / unassigned | **Review** — not installed / no owner |
+| `balance_due == 0` | — | paid — not in AR, ignore |
 
-Treat `collected_total < 1` as zero (rounding). These are the same numbers the
-job's P&L page shows, so they match what the office sees.
+Treat amounts under $1 as zero (rounding). These match the numbers the office
+sees on the job P&L and the AR screen.
 
 ## `ar_aging_report()` — the outstanding-invoice funnel
 
@@ -100,27 +110,41 @@ counts and totals) and `invoices` grouped the same way. Each invoice:
 }
 ```
 
-Use `job_id` to pull `get_job` / `get_job_financials`. `balance_due == total`
-means nothing collected on that invoice; `status: "partial"` means some came in.
-`issue_date` is a good age proxy when you want to sort most-at-risk first.
+Use `job_id` to pull `get_job`. `balance_due == total` → nothing collected on
+that invoice; `status: "partial"` → some came in; `collected = total −
+balance_due`. `issue_date` is your age proxy when `installed_at` is null. A job
+can have more than one outstanding invoice — keep them as separate lines, as the
+AR report does.
 
-## Worked example (today = 2026-08-10)
+**Reconciliation is the acceptance test.** Sum `balance_due` across every
+invoice you output; it must equal `summary.grand_total`. If it doesn't, you
+dropped or double-counted an invoice.
 
-1. `ar_aging_report()` → invoice `6044-1`, `job_id` `e795a757-...`,
-   `total 23859.79`, `balance_due 23859.79`, `issue_date 2026-07-01`.
-2. `get_job(e795a757-...)` → `installed_at 2026-07-01T...`,
-   `assigned_to bsibbett@roofingforce.com`, retail (no insurance fields),
-   customer + phone.
-3. `get_job_financials(e795a757-...)` → `collected_total 0`, `balance_due
-   23859.79`, `invoiced_total 23859.79`.
-4. Rule check: install ~40 days ago (≥2 ✓), `collected_total == 0` ✓, not
-   cancelled ✓ → **PRIMARY alert**, grouped under `bsibbett`.
-5. Draft:
+## Worked examples (today = 2026-08-10)
 
+**Nothing collected (urgent):**
+1. `ar_aging_report()` → invoice `6044-1`, job `e795a757-...`, `total 23859.79`,
+   `balance_due 23859.79` (== total → nothing collected).
+2. `get_job(e795a757-...)` → `assigned_to wstandridge@...`, `work_type
+   Insurance`, `installed_at 2026-06-30` (41 days ago ✓ ≥2), customer + phone.
+3. collected = 23859.79 − 23859.79 = 0 → **Nothing collected**, urgent, under
+   `wstandridge`:
    ```
-   @bsibbett — collect on Job #6044, <customer> (<city>)
-   Installed Jul 1 (40 days ago) · $0 collected of $23,860 · nothing in yet.
-   Retail job — go get the first payment. Customer: <phone>.
+   @wstandridge — collect on Job #6044, Alex Waloski (Elkins, AR) — INSURANCE
+   Installed Jun 30 (41 days ago) · $0 collected of $23,860 · nothing in yet.
+   Chase the first/ACV check AND the deductible. Customer: (479) 317-5157.
+   ```
+
+**Partial (balance remains):**
+1. Invoice `5929-1`, job `4a7b5fb6-...`, `total 19439.71`, `balance_due 9719.86`
+   (0 < balance < total → partial).
+2. `get_job` → `assigned_to rmdavis@...`, `work_type Insurance`, installed
+   Jun 14.
+3. collected = 19439.71 − 9719.86 = 9719.85 → **Partial**, under `rmdavis`:
+   ```
+   @rmdavis — Job #5929, Marsha McRoberts (Osawatomie, KS) — INSURANCE
+   PARTIAL: $9,720 in, $9,720 still owed of $19,440. Installed Jun 14 (57d ago).
+   Collect the remaining balance. Customer: (913) 755-6441.
    ```
 
 ## Rep email → display name
