@@ -1,0 +1,3 @@
+# Generated AR/collections reports — contain customer PII (names, phones).
+# Kept local only; never committed to the repo.
+reports/
