@@ -53,6 +53,15 @@ mention the weekly rollup is available.
 
 ## The detection rule (be precise here)
 
+**What "completed" means here — read this first.** The business rule is "the
+*install* is completed." In EaveSide that is signaled by `installed_at` being
+set, which happens when a job moves into the **`payments_invoicing`** stage —
+NOT by the status literally named `job_completed`. Counter-intuitively,
+`job_completed` is the *terminal, already-paid* state (old closed jobs); keying
+detection on that status alone would find nothing to collect. So detect on
+"install date is set + nothing collected," and sweep both `payments_invoicing`
+and `job_completed` so a genuinely uncollected completed job is never missed.
+
 A job belongs on the follow-up list when **all** of these hold:
 
 - The install is finished — `installed_at` is set and is a real past date.
@@ -86,10 +95,15 @@ Instead, funnel down to a small candidate set, then enrich only those.
 **Step 1 — build the candidate set (cheap, a few calls):**
 
 - `list_jobs(status="payments_invoicing", limit=50)` — this is the
-  billing/collection stage where installed-but-unpaid jobs naturally sit.
+  billing/collection stage where installed-but-unpaid jobs naturally sit. This
+  is the primary pool for the follow-up rule.
 - `ar_aging_report()` — one call returns every outstanding invoice with its
   `job_id`, `issue_date`, `total`, and `balance_due`, already bucketed by age.
-  Any job here has an unpaid balance.
+  Any job here has an unpaid balance, whatever its status — this is the safety
+  net that catches an uncollected `job_completed` job.
+- `list_jobs(status="job_completed", limit=50)` — the closed pile is mostly
+  paid, but sweep it too and keep only rows where `collected_total == 0`, so a
+  completed-but-never-collected job doesn't slip through. Most will drop out.
 - Optionally `list_jobs(status="production", limit=50)` if you want jobs that
   just wrapped install but haven't moved to invoicing yet.
 
