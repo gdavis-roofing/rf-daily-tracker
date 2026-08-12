@@ -82,6 +82,11 @@ settled. **Every one of these customers is paid in full according to AccuLynx.**
 correct figure and restate these 30? We think yes, but it changes recognised revenue,
 so it is your call, not ours. Nothing is being changed until you say so.
 
+> **Status (2026-08-12): APPROVED by the owner** — "make the changes but keep a
+> paper trail." Authorization and audit-trail requirements are recorded in
+> `restatement-authorization-2026-08-12.md`; execution is queued against the
+> Eaveside database with the full paper trail specified there.
+
 ### 4. One job waiting on an answer from operations
 
 **3874 Ryan Imholz, $58,000.** Cancelled after materials were delivered and kept.
