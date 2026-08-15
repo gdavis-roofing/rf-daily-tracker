@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RF Claim Scope Analyzer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; min-height: 100vh; }
+
+  /* HEADER */
+  .header {
+    background: #CC1414;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .header-logo { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: #fff; }
+  .header-logo span { color: rgba(255,255,255,0.6); font-weight: 400; font-size: 14px; margin-left: 8px; }
+
+  /* MAIN LAYOUT */
+  .layout { display: flex; height: calc(100vh - 54px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 300px;
+    background: #222;
+    border-right: 1px solid #333;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .sidebar-section { display: flex; flex-direction: column; gap: 8px; }
+  .sidebar-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #888; margin-bottom: 4px; }
+
+  .field-group { display: flex; flex-direction: column; gap: 4px; }
+  .field-label { font-size: 11px; color: #888; }
+  .field-input {
+    background: #2d2d2d;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .field-input:focus { border-color: #CC1414; }
+  .field-input.auto-filled { border-color: #2a6e2a; background: #1e2e1e; }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 2px dashed #444;
+    border-radius: 10px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #2a2a2a;
+  }
+  .upload-zone:hover, .upload-zone.drag-over { border-color: #CC1414; background: #2d1a1a; }
+  .upload-zone .upload-icon { font-size: 32px; margin-bottom: 8px; }
+  .upload-zone .upload-text { font-size: 13px; color: #aaa; }
+  .upload-zone .upload-text strong { color: #fff; display: block; margin-bottom: 4px; }
+  #fileInput { display: none; }
+
+  .file-selected {
+    background: #1e2e1e;
+    border: 1px solid #2a6e2a;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #4caf50;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .file-selected.show { display: flex; }
+
+  /* PARSE BUTTON */
+  .parse-btn {
+    background: #CC1414;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    width: 100%;
+  }
+  .parse-btn:hover:not(:disabled) { background: #aa1010; }
+  .parse-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* SPINNER */
+  .spinner-wrap { text-align: center; padding: 10px; display: none; }
+  .spinner-wrap.show { display: block; }
+  .spinner {
+    display: inline-block;
+    width: 28px; height: 28px;
+    border: 3px solid #444;
+    border-top-color: #CC1414;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .spinner-text { font-size: 12px; color: #888; margin-top: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SUMMARY CARDS */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .summary-card {
+    background: #2a2a2a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .summary-card.highlight { background: #2d1a1a; border-color: #CC1414; }
+  .summary-card.green { background: #1a2d1a; border-color: #2a6e2a; }
+  .summary-card.amber { background: #2d2a1a; border-color: #8a6a00; }
+  .summary-card .s-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .summary-card .s-value { font-size: 16px; font-weight: 700; color: #fff; }
+  .summary-card.highlight .s-value { color: #ff6b6b; }
+  .summary-card.green .s-value { color: #4caf50; }
+  .summary-card.amber .s-value { color: #ffa726; }
+
+  /* TAX NOTICE BADGE */
+  .tax-notice {
+    background: #2d2a1a;
+    border: 1px solid #8a6a00;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: #ffa726;
+    display: none;
+  }
+  .tax-notice.show { display: block; }
+  .tax-notice strong { display: block; margin-bottom: 2px; }
+
+  /* FINANCIAL BREAKDOWN BOX - 3 side-by-side */
+  .oop-box { display: none; }
+  .oop-box.show { display: flex; gap: 6px; }
+  .fin-card { flex: 1; border-radius: 8px; padding: 8px 10px; min-width: 0; }
+  .fin-card.green-card { background: #1a2d1a; border: 1px solid #2a6e2a; }
+  .fin-card.red-card { background: #2d1a1a; border: 1px solid #8a2a2a; }
+  .fin-label { font-size: 9px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: #aaa; margin-bottom: 3px; }
+  .fin-val { font-size: 13px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fin-card.green-card .fin-val { color: #4caf50; }
+  .fin-card.red-card .fin-val { color: #ff6b6b; }
+  .fin-sub { font-size: 9px; color: #555; margin-top: 2px; line-height: 1.3; }
+
+  /* GENERATE PDF BUTTON */
+  .gen-btn {
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+    display: none;
+  }
+  .gen-btn.show { display: block; }
+  .gen-btn:hover { background: #444; border-color: #CC1414; }
+
+  /* MAIN CONTENT */
+  .main { flex: 1; overflow-y: auto; padding: 20px; }
+
+  /* POLICY BADGE */
+  .policy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #888; }
+  .badge-dot.rcv { background: #4caf50; }
+  .badge-dot.acv { background: #ff6b6b; }
+  .badge-dot.mixed { background: #ffa726; }
+
+  /* SECTION HEADER */
+  .section-header {
+    background: #2a2a2a;
+    border-left: 3px solid #CC1414;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #ccc;
+    margin-bottom: 2px;
+    margin-top: 16px;
+    text-transform: uppercase;
+  }
+
+  /* LINE ITEMS TABLE */
+  .items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .items-table th {
+    background: #2a2a2a;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .items-table th.num { text-align: right; }
+  .items-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #2a2a2a;
+    vertical-align: middle;
+  }
+  .items-table tr:hover td { background: #252525; }
+  .items-table tr.declined td { opacity: 0.45; text-decoration: line-through; }
+  .items-table tr.declined td.no-strike { text-decoration: none; opacity: 1; }
+  .items-table td.num { text-align: right; font-family: monospace; font-size: 12px; }
+  .items-table td.desc { max-width: 260px; }
+  .items-table td.qty { color: #aaa; font-size: 12px; white-space: nowrap; }
+  .dep-rec { color: #4caf50; }
+  .dep-nonrec { color: #ff6b6b; }
+
+  /* CHECKBOX */
+  .decline-cb { width: 16px; height: 16px; cursor: pointer; accent-color: #CC1414; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    color: #555;
+  }
+  .empty-state .big-icon { font-size: 64px; }
+  .empty-state p { font-size: 15px; }
+
+  /* ERROR */
+  .error-box {
+    background: #2d1a1a;
+    border: 1px solid #8a2a2a;
+    border-radius: 8px;
+    padding: 14px;
+    color: #ff8888;
+    font-size: 13px;
+    display: none;
+  }
+  .error-box.show { display: block; }
+
+  /* DISCLAIMER */
+  .disclaimer-box {
+    background: #1e1e2d;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #1a1a1a; }
+  ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .layout { flex-direction: column; height: auto; }
+    .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #333; padding: 14px; }
+    .main { padding: 14px; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .oop-box.show { flex-direction: column; gap: 6px; }
+    .fin-card { padding: 10px 12px; }
+    .fin-val { font-size: 20px; }
+    .fin-label { font-size: 10px; }
+    .items-table { font-size: 11px; }
+    .items-table td, .items-table th { padding: 6px 6px; }
+    .items-table td.desc { max-width: 140px; }
+    .header-logo { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">RF <span>Claim Scope Analyzer</span></div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- UPLOAD -->
+    <div class="sidebar-section">
+      <div class="sidebar-title">Upload Claim PDF</div>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text">
+          <strong>Click to select PDF</strong>
+          or drag and drop
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept=".pdf">
+      <div class="file-selected" id="fileSelected">
+        <span>✓</span>
+        <span id="fileName"></span>
+      </div>
+      <div class="error-box" id="errorBox"></div>
+      <button class="parse-btn" id="parseBtn" onclick="parseClaim()" disabled>Analyze Claim</button>
+      <div class="spinner-wrap" id="spinnerWrap">
+        <div class="spinner"></div>
+        <div class="spinner-text">Reading claim...</div>
+      </div>
+    </div>
+
+    <!-- CLAIM INFO -->
+    <div class="sidebar-section" id="claimInfoSection">
+      <div class="sidebar-title">Claim Information</div>
+      <div class="field-group">
+        <div class="field-label">Customer Name</div>
+        <input class="field-input" id="customerName" type="text" placeholder="Will auto-fill from claim">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Property Address</div>
+        <input class="field-input" id="customerAddress" type="text" placeholder="Will auto-fill from claim">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Claim Number</div>
+        <input class="field-input" id="claimNumber" type="text" placeholder="Will auto-fill from claim">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Deductible</div>
+        <input class="field-input" id="deductible" type="number" placeholder="Will auto-fill from claim" oninput="recalcOOP()">
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="sidebar-section" id="summarySection" style="display:none">
+      <div class="sidebar-title">Claim Summary</div>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="s-label">Total RCV</div>
+          <div class="s-value" id="sumRCV">—</div>
+        </div>
+        <div class="summary-card">
+          <div class="s-label">Total ACV</div>
+          <div class="s-value" id="sumACV">—</div>
+        </div>
+        <div class="summary-card highlight">
+          <div class="s-label">Non-Rec Dep</div>
+          <div class="s-value" id="sumNonRec">—</div>
+        </div>
+        <div class="summary-card green">
+          <div class="s-label">Rec Dep</div>
+          <div class="s-value" id="sumRec">—</div>
+        </div>
+        <div class="summary-card">
+          <div class="s-label">Net Claim</div>
+          <div class="s-value" id="sumNet">—</div>
+        </div>
+        <div class="summary-card green">
+          <div class="s-label">If Recovered</div>
+          <div class="s-value" id="sumRecovered">—</div>
+        </div>
+        <div class="summary-card" id="priorPayCard" style="display:none;grid-column:span 2">
+          <div class="s-label">Prior Payments</div>
+          <div class="s-value" id="sumPrior">—</div>
+        </div>
+      </div>
+
+      <!-- TAX NOTICE — shown only for summary-tax carriers like Shelter -->
+      <div class="tax-notice" id="taxNotice">
+        <strong>⚠️ Sales Tax Included</strong>
+        <span id="taxNoticeText"></span>
+      </div>
+    </div>
+
+    <!-- FINANCIAL BREAKDOWN - 3 boxes side by side -->
+    <div class="oop-box" id="oopBox">
+      <div class="fin-card green-card">
+        <div class="fin-label">&#x1F4B0; 1st Check</div>
+        <div class="fin-val" id="firstCheck">$0.00</div>
+        <div class="fin-sub">ACV (excl. PWI) &minus; deductible</div>
+      </div>
+      <div class="fin-card green-card">
+        <div class="fin-label">&#x1F4B0; 2nd Check</div>
+        <div class="fin-val" id="secondCheck">$0.00</div>
+        <div class="fin-sub">Rec dep + PWI performed</div>
+      </div>
+      <div class="fin-card red-card">
+        <div class="fin-label">&#x1F3E0; Out of Pocket</div>
+        <div class="fin-val" id="oopValue">$0.00</div>
+        <div class="fin-sub" id="oopSub">Deductible + non-rec dep</div>
+      </div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div id="sanityWarnings" style="display:none;margin-bottom:12px;font-size:13px;"></div>
+        <div class="disclaimer-box" id="disclaimerBox">
+      <strong style="color:#aaa">Non-Covered Items</strong> necessary to complete the Project that are outside of the coverage of your insurance policy, including but is not limited to: rotten decking and/or facia, hidden damage, etc., will be your responsibility to pay.
+    </div>
+
+    <!-- GENERATE PDF -->
+    <button class="gen-btn" id="genBtn" onclick="generatePDF()">📄 Generate Customer Report</button>
+
+  </div><!-- /sidebar -->
+
+  <!-- MAIN CONTENT -->
+  <div class="main" id="mainContent">
+    <div class="empty-state" id="emptyState">
+      <div class="big-icon">🏠</div>
+      <p>Upload an insurance claim PDF to get started</p>
+    </div>
+    <div id="lineItemsArea" style="display:none"></div>
+  </div>
+
+</div><!-- /layout -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
+  <script>
+let parsedData = null;
+let selectedFile = null;
+
+// ── FILE HANDLING ──
+const fileInput = document.getElementById('fileInput');
+const uploadZone = document.getElementById('uploadZone');
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) setFile(e.target.files[0]);
+});
+
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+});
+
+function setFile(file) {
+  if (!file.name.endsWith('.pdf')) {
+    showError('Please upload a PDF file.');
+    return;
+  }
+  selectedFile = file;
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSelected').classList.add('show');
+  document.getElementById('parseBtn').disabled = false;
+  hideError();
+}
+
+// ── PARSE CLAIM ──
+async function parseClaim() {
+  if (!selectedFile) return;
+
+  hideError();
+  document.getElementById('parseBtn').disabled = true;
+  document.getElementById('spinnerWrap').classList.add('show');
+  document.getElementById('summarySection').style.display = 'none';
+  document.getElementById('oopBox').classList.remove('show');
+  document.getElementById('genBtn').classList.remove('show');
+  document.getElementById('taxNotice').classList.remove('show');
+
+  document.getElementById('lineItemsArea').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'flex';
+
+  try {
+    let pdfBase64 = await fileToBase64(selectedFile);
+
+    if (pdfBase64.length > 4000000) {
+      document.querySelector('.spinner-text').textContent = 'Compressing large PDF...';
+      pdfBase64 = await rasterizePDF(pdfBase64, 4000000);
+    }
+
+    const response = await fetch('/api/parse-claim', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pdfBase64, filename: selectedFile.name })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: 'Server error' }));
+      throw new Error(err.error || `HTTP ${response.status}`);
+    }
+
+    parsedData = await response.json();
+    renderResults(parsedData);
+
+  } catch (err) {
+    showError('Error: ' + err.message);
+  } finally {
+    document.getElementById('parseBtn').disabled = false;
+    document.getElementById('spinnerWrap').classList.remove('show');
+  }
+}
+
+async function rasterizePDF(base64, targetBytes) {
+  const spinnerText = document.querySelector('.spinner-text');
+  const pdfBytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+  const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+  const numPages = pdf.numPages;
+  const attempts = [
+    { scale: 1.5, quality: 0.82 },
+    { scale: 1.2, quality: 0.78 },
+    { scale: 1.0, quality: 0.72 },
+    { scale: 0.85, quality: 0.65 },
+  ];
+  for (const { scale, quality } of attempts) {
+    const newDoc = await PDFLib.PDFDocument.create();
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    for (let i = 1; i <= numPages; i++) {
+      if (spinnerText) spinnerText.textContent = `Compressing... page ${i}/${numPages}`;
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale });
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      const jpegBase64 = canvas.toDataURL('image/jpeg', quality).split(',')[1];
+      const jpegBytes = Uint8Array.from(atob(jpegBase64), c => c.charCodeAt(0));
+      const img = await newDoc.embedJpg(jpegBytes);
+      const p = newDoc.addPage([viewport.width, viewport.height]);
+      p.drawImage(img, { x: 0, y: 0, width: viewport.width, height: viewport.height });
+    }
+    const saved = await newDoc.save();
+    let binary = '';
+    for (let i = 0; i < saved.length; i += 8192) binary += String.fromCharCode(...saved.subarray(i, i + 8192));
+    const result = btoa(binary);
+    if (spinnerText) spinnerText.textContent = `Compressed to ${(result.length/1024/1024).toFixed(1)}MB`;
+    if (result.length < targetBytes || quality === 0.65) {
+      if (spinnerText) spinnerText.textContent = 'Reading claim...';
+      return result;
+    }
+  }
+}
+
+async function fileToBase64(file) {
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  return base64;
+}
+
+// ── RENDER RESULTS ──
+function renderResults(data) {
+  autoFill('customerName', data.customerName);
+  autoFill('customerAddress', data.customerAddress);
+  autoFill('claimNumber', data.claimNumber);
+  autoFillNumber('deductible', data.summaryDeductible);
+
+  document.getElementById('sumRCV').textContent = fmt(data.summaryRCV);
+  document.getElementById('sumACV').textContent = fmt(data.summaryACV);
+  document.getElementById('sumNonRec').textContent = fmt(data.summaryNonRecDep);
+  document.getElementById('sumRec').textContent = fmt(data.summaryRecDep);
+  document.getElementById('sumNet').textContent = fmt(data.summaryNetClaim);
+  document.getElementById('sumRecovered').textContent = fmt(data.summaryNetIfRecovered);
+  if (data.summaryPriorPayments > 0) {
+    document.getElementById('sumPrior').textContent = fmt(data.summaryPriorPayments);
+    document.getElementById('priorPayCard').style.display = 'block';
+  }
+  document.getElementById('summarySection').style.display = 'block';
+
+  // Show tax notice for summary-tax carriers (e.g. Shelter)
+  const carrierNameForTax = (data.carrier || '').toLowerCase();
+  const effectiveTaxMethod = data.taxMethod || (carrierNameForTax.includes('shelter') ? 'summary' : 'line_item');
+  const effectiveTaxAmount = data.taxAmount || 0;
+  if (effectiveTaxMethod === 'summary' && effectiveTaxAmount > 0) {
+    document.getElementById('taxNoticeText').textContent =
+      `${data.carrier} applies sales tax at the summary level (${data.taxRate}% = ${fmt(effectiveTaxAmount)}). Tax is included in totals shown on the customer report.`;
+    document.getElementById('taxNotice').classList.add('show');
+  }
+
+  renderLineItems(data.lineItems);
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('lineItemsArea').style.display = 'block';
+  document.getElementById('oopBox').classList.add('show');
+  document.getElementById('genBtn').classList.add('show');
+
+  recalcOOP();
+}
+
+function autoFill(id, value) {
+  const el = document.getElementById(id);
+  if (value && value.trim()) {
+    el.value = value.trim();
+    el.classList.add('auto-filled');
+  }
+}
+
+function autoFillNumber(id, value) {
+  const el = document.getElementById(id);
+  if (value && value > 0) {
+    el.value = value;
+    el.classList.add('auto-filled');
+  }
+}
+
+function renderLineItems(items) {
+  const area = document.getElementById('lineItemsArea');
+
+  const policyType = parsedData.policyType || 'UNKNOWN';
+  const dotClass = policyType === 'RCV' ? 'rcv' : policyType === 'ACV' ? 'acv' : 'mixed';
+  let html = `<div class="policy-badge">
+    <div class="badge-dot ${dotClass}"></div>
+    <span>${parsedData.carrier || 'Unknown Carrier'}</span>
+    <span style="color:#555">|</span>
+    <span>${policyType} Policy</span>
+    ${parsedData.hasOP ? '<span style="color:#555">|</span><span style="color:#ffa726">O&P Included</span>' : ''}
+    ${(parsedData.taxMethod === 'summary' || (parsedData.carrier||'').toLowerCase().includes('shelter')) && (parsedData.taxAmount > 0 || parsedData.summaryRCV > parsedData.lineItems.reduce((s,i)=>s+(i.rcv||0),0)) ? '<span style="color:#555">|</span><span style="color:#ffa726">Tax @ Summary</span>' : ''}
+  </div>`;
+
+  const sections = {};
+  items.forEach(item => {
+    const sec = item.section || 'Other';
+    if (!sections[sec]) sections[sec] = [];
+    sections[sec].push(item);
+  });
+
+  html += `<table class="items-table">
+    <thead>
+      <tr>
+        <th style="width:36px">Decline</th>
+        <th>#</th>
+        <th>Description</th>
+        <th>Qty</th>
+        <th class="num">RCV</th>
+        <th class="num">Rec Dep</th>
+        <th class="num">Non-Rec Dep</th>
+        <th class="num">ACV</th>
+      </tr>
+    </thead>
+    <tbody id="itemsTbody">`;
+
+  Object.entries(sections).forEach(([section, sectionItems]) => {
+    html += `</tbody><tbody>
+      <tr><td colspan="8" style="padding:0">
+        <div class="section-header">${section}</div>
+      </td></tr>
+    </tbody><tbody id="itemsTbody">`;
+
+    sectionItems.forEach(item => {
+      if (item.paidWhenIncurred) {
+        html += `<tr id="row-${item.lineNumber}" data-line="${item.lineNumber}" style="background:#0d1f0d">
+          <td class="no-strike" style="text-align:center;color:#555" title="PWI items cannot be declined">—</td>
+          <td style="color:#666;font-size:11px">${item.lineNumber}</td>
+          <td class="desc">
+            <div style="color:#4caf50;font-weight:600">${item.description}</div>
+            <div style="margin-top:5px;display:flex;align-items:center;gap:6px">
+              <input type="checkbox" class="pwi-cb" data-line="${item.lineNumber}" onchange="recalcOOP()" style="accent-color:#4caf50;width:14px;height:14px;cursor:pointer">
+              <span style="font-size:10px;color:#4caf50;font-weight:700;letter-spacing:0.3px">PAID WHEN INCURRED — check if RF will perform</span>
+            </div>
+          </td>
+          <td class="qty">${item.quantity}</td>
+          <td class="num" style="color:#4caf50">
+            <input type="number" step="0.01" value="${item.rcv}" 
+              id="pwi-rcv-${item.lineNumber}"
+              style="width:90px;background:#0d1f0d;border:1px solid #2a6e2a;border-radius:4px;color:#4caf50;font-size:12px;padding:3px 6px;text-align:right"
+              oninput="updatePwiRCV(${item.lineNumber}, this.value)"
+              title="Edit if carrier uses a Code Upgrade bucket (e.g. Travelers)">
+          </td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num" style="color:#4caf50">$${fmtNum(item.acv)}</td>
+        </tr>`;
+      } else {
+        html += `<tr id="row-${item.lineNumber}" data-line="${item.lineNumber}">
+          <td class="no-strike" style="text-align:center">
+            <input type="checkbox" class="decline-cb" onchange="toggleDecline(${item.lineNumber}, this.checked)" title="Mark as declined">
+          </td>
+          <td style="color:#666;font-size:11px">${item.lineNumber}</td>
+          <td class="desc">${item.description}</td>
+          <td class="qty">${item.quantity}</td>
+          <td class="num">$${fmtNum(item.rcv)}</td>
+          <td class="num dep-rec">${item.recoverableDep > 0 ? '$' + fmtNum(item.recoverableDep) : '—'}</td>
+          <td class="num dep-nonrec">${item.nonRecoverableDep > 0 ? '$' + fmtNum(item.nonRecoverableDep) : '—'}</td>
+          <td class="num">$${fmtNum(item.acv)}</td>
+        </tr>`;
+      }
+    });
+  });
+
+  html += `</tbody></table>`;
+  area.innerHTML = html;
+}
+
+// ── TOGGLE DECLINE ──
+function toggleDecline(lineNumber, isDeclined) {
+  const row = document.getElementById('row-' + lineNumber);
+  if (isDeclined) {
+    row.classList.add('declined');
+  } else {
+    row.classList.remove('declined');
+  }
+  recalcOOP();
+}
+
+// ── FINANCIAL CALCULATIONS ──
+// Store PWI overrides
+const pwiRCVOverrides = {};
+
+function updatePwiACV(lineNumber, value) {
+  const num = parseFloat(value) || 0;
+  const item = parsedData.lineItems.find(i => i.lineNumber === lineNumber);
+  if (item) item.acvOverride = num;
+  recalcOOP();
+}
+
+function updatePwiRCV(lineNumber, value) {
+  const num = parseFloat(value) || 0;
+  pwiRCVOverrides[lineNumber] = num;
+  // Update the parsedData item so PDF picks it up
+  const item = parsedData.lineItems.find(i => i.lineNumber === lineNumber);
+  if (item) item.rcvOverride = num;
+  recalcOOP();
+}
+
+function recalcOOP() {
+  if (!parsedData) return;
+
+  const deductible = parseFloat(document.getElementById('deductible').value) || 0;
+
+  const declinedRows = document.querySelectorAll('tr.declined');
+  const declinedNums = new Set();
+  declinedRows.forEach(row => {
+    declinedNums.add(parseInt(row.id.replace('row-', '')));
+  });
+
+  const pwiPerformed = new Set();
+  document.querySelectorAll('.pwi-cb:checked').forEach(cb => {
+    pwiPerformed.add(parseInt(cb.dataset.line));
+  });
+
+  let allScopeACV = 0;
+  let recDepContracted = 0;
+  let pwiRCV = 0;
+  let nonRecDepContracted = 0;
+  let declinedACV = 0;
+
+  parsedData.lineItems.forEach(item => {
+    if (item.paidWhenIncurred) {
+      if (pwiPerformed.has(item.lineNumber)) {
+        pwiRCV += (item.rcvOverride !== undefined ? item.rcvOverride : item.rcv) || 0;
+      }
+      return;
+    }
+
+    allScopeACV += item.acv || 0;
+
+    if (declinedNums.has(item.lineNumber)) {
+      declinedACV += item.acv || 0;
+    } else {
+      nonRecDepContracted += item.nonRecoverableDep || 0;
+      recDepContracted += item.recoverableDep || 0;
+    }
+  });
+
+  // For summary-tax carriers (Shelter), add tax to 1st check
+  const carrierName = (parsedData.carrier || '').toLowerCase();
+  const isShelter = carrierName.includes('shelter');
+  const effectiveTaxMethod = parsedData.taxMethod || (isShelter ? 'summary' : 'line_item');
+  let taxAmount = (effectiveTaxMethod === 'summary') ? (parsedData.taxAmount || 0) : 0;
+  if (isShelter && taxAmount === 0) {
+    const lineItemRCVSum = parsedData.lineItems.reduce((s, i) => s + (i.rcv || 0), 0);
+    const derivedTax = (parsedData.summaryRCV || 0) - lineItemRCVSum;
+    if (derivedTax > 0) taxAmount = derivedTax;
+  }
+  const taxAdjustedACV = allScopeACV + taxAmount;
+
+  const trueACV = (parsedData.summaryRCV || 0) - (parsedData.summaryRecDep || 0) - (parsedData.summaryNonRecDep || 0); const firstCheck = Math.max(0, trueACV - deductible);
+  const hasDeclined = declinedNums.size > 0;
+  const effectiveRecDep = hasDeclined ? recDepContracted : (parsedData.summaryRecDep || recDepContracted);
+  const secondCheck = effectiveRecDep + pwiRCV;
+  // Apportion summary-level tax to declined scope so on-screen OOP matches the
+  // PDF calc (which also nets declined tax into OOP).
+  let declinedTaxRecalc = 0;
+  if (effectiveTaxMethod === 'summary' && taxAmount > 0 && allScopeACV > 0) {
+    declinedTaxRecalc = taxAmount * (declinedACV / allScopeACV);
+  }
+  const declinedACVwTaxRecalc = declinedACV + declinedTaxRecalc;
+  const declinedCreditRecalc = Math.max(0, declinedACVwTaxRecalc - deductible);
+  const oop = Math.max(0, deductible + nonRecDepContracted - declinedACVwTaxRecalc);
+
+  const declinedRCVsum = parsedData.lineItems.filter(i => !i.paidWhenIncurred && declinedNums.has(i.lineNumber)).reduce((s,i) => s+(i.rcv||0), 0);
+  const displayRCV = (parsedData.summaryRCV || 0) - declinedRCVsum + pwiRCV;
+  document.getElementById('sumRCV').textContent = '$' + fmtNum(displayRCV);
+  document.getElementById('firstCheck').textContent = '$' + fmtNum(firstCheck);
+  const pwiChecked = new Set();
+  document.querySelectorAll('.pwi-cb:checked').forEach(cb => { pwiChecked.add(parseInt(cb.dataset.line)); });
+  let pwiRCVrecalc = 0;
+  parsedData.lineItems.forEach(item => {
+    if (item.paidWhenIncurred && pwiChecked.has(item.lineNumber)) pwiRCVrecalc += (item.rcvOverride !== undefined ? item.rcvOverride : item.rcv) || 0;
+  });
+  const hasDeclinedRecalc = document.querySelectorAll('tr.declined').length > 0;
+  const declinedNumsRecalc = new Set(); document.querySelectorAll("tr.declined").forEach(tr => { const n = parseInt(tr.dataset.line); if (!isNaN(n)) declinedNumsRecalc.add(n); });
+  const recDepContractedRecalc = parsedData.lineItems.filter(i => !i.paidWhenIncurred && !declinedNumsRecalc.has(i.lineNumber)).reduce((s,i) => s + (i.recoverableDep||0), 0);
+  const effectiveRecDepRecalc = hasDeclinedRecalc ? recDepContractedRecalc : (parsedData.summaryRecDep || recDepContractedRecalc);
+  const secondCheckRecalc = effectiveRecDepRecalc + pwiRCVrecalc;
+  document.getElementById('secondCheck').textContent = '$' + fmtNum(secondCheckRecalc);
+  document.getElementById('oopValue').textContent = '$' + fmtNum(oop);
+  document.getElementById('oopSub').textContent = declinedACV > 0 ? 'Deductible + non-rec dep − declined ACV (incl. tax)' : 'Deductible + non-rec dep';
+      recalcWarnings();
+}
+
+// ── GENERATE PDF ──
+    function recalcWarnings() {
+      if (!parsedData) return;
+      firstCheck = firstCheck || 0;
+      const warnings = [];
+      const tol = 1.00;
+      const _summaryRCV = (parsedData.summaryRCV || 0) + (parsedData.codeUpgradeRCV || 0);
+      const _summaryNetClaim = parsedData.summaryNetClaim || 0;
+      const _summaryRecDep = parsedData.summaryRecDep || 0;
+      const taxLineAdj = parsedData.taxAmount || 0;
+      const _expectedRCV = (parsedData.summaryRCV || 0) + (parsedData.codeUpgradeRCV || 0);
+      const totalContractedPlusDeclined = _expectedRCV;
+      if (Math.abs(firstCheck - _summaryNetClaim) > tol)
+        warnings.push(`1st Check mismatch: $${firstCheck.toFixed(2)} vs summary Net Claim $${_summaryNetClaim.toFixed(2)}`);
+      if (firstCheck < 0)
+        warnings.push(`1st Check is negative: $${firstCheck.toFixed(2)}`);
+      if (_summaryRecDep < 0)
+        warnings.push(`Recoverable depreciation is negative`);
+      const warningBox = document.getElementById('sanityWarnings');
+      if (warningBox) {
+        if (warnings.length > 0) {
+          warningBox.innerHTML = '<strong>⚠ Review Before Generating Report:</strong><ul style="margin:6px 0 0 16px">' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>';
+          warningBox.style.cssText = 'display:block;background:#fff8e1;border:1px solid #f9a825;border-radius:6px;padding:12px 16px;margin-bottom:12px;color:#333';
+        } else {
+          warningBox.innerHTML = '✅ Numbers verified — all totals balance.';
+          warningBox.style.cssText = 'display:block;background:#e8f5e9;border:1px solid #388e3c;border-radius:6px;padding:12px 16px;margin-bottom:12px;color:#1b5e20';
+        }
+      }
+    }
+
+async function generatePDF() {
+  if (!parsedData) return;
+
+  const customerName = document.getElementById('customerName').value || 'Customer';
+  const customerAddress = document.getElementById('customerAddress').value || '';
+  const claimNumber = document.getElementById('claimNumber').value || '';
+  const deductible = parseFloat(document.getElementById('deductible').value) || 0;
+
+  const declinedRows = document.querySelectorAll('tr.declined');
+  const declinedNums = new Set();
+  declinedRows.forEach(row => {
+    const id = row.id.replace('row-', '');
+    declinedNums.add(parseInt(id));
+  });
+
+  const acceptedItems = parsedData.lineItems.filter(i => !declinedNums.has(i.lineNumber));
+  const declinedItems = parsedData.lineItems.filter(i => declinedNums.has(i.lineNumber));
+
+  // ── CONTRACTED TOTALS ──
+  let contractedRCV = 0, contractedRecDep = 0, contractedNonRecDep = 0, contractedACV = 0;
+  acceptedItems.forEach(i => {
+    if (i.paidWhenIncurred) return; // PWI items excluded — summaryRCV is ground truth
+    contractedRCV      += i.rcv || 0;
+    contractedRecDep   += i.recoverableDep || 0;
+    contractedNonRecDep += i.nonRecoverableDep || 0;
+    contractedACV      += i.acv || 0;
+  });
+
+  // ── DECLINED TOTALS ──
+  let declinedRCV = 0, declinedRecDep = 0, declinedNonRecDep = 0, declinedACV = 0;
+  declinedItems.forEach(i => {
+    declinedRCV      += i.rcv || 0;
+    declinedRecDep   += i.recoverableDep || 0;
+    declinedNonRecDep += i.nonRecoverableDep || 0;
+    declinedACV      += i.acv || 0;
+  });
+
+  // ── TAX ──
+  // Fallback: if carrier name contains "Shelter", force summary tax method
+  const carrierName = (parsedData.carrier || '').toLowerCase();
+  const isShelter = carrierName.includes('shelter');
+  let taxMethod = isShelter ? 'summary' : (parsedData.taxMethod || 'line_item');
+  let taxRate   = parsedData.taxRate   || 0;
+  let taxAmount = parsedData.taxAmount || 0;
+  // If Shelter detected but taxAmount not parsed, pull from summaryRCV - subtotal
+  if (isShelter && taxMethod === 'summary' && taxAmount === 0) {
+    // Try to derive tax from the difference between summaryRCV and line item sum
+    const lineItemRCVSum = parsedData.lineItems.reduce((s, i) => s + (i.rcv || 0), 0);
+    const derivedTax = (parsedData.summaryRCV || 0) - lineItemRCVSum;
+    if (derivedTax > 0) taxAmount = derivedTax;
+  }
+
+  // For summary-tax carriers, add tax into contracted totals
+  // Tax applies to materials only — we show it as a line item in the report
+  // Apportion tax proportionally between contracted and declined by ACV ratio
+  let contractedTax = 0, declinedTax = 0;
+  if (taxMethod === 'summary' && taxAmount > 0) {
+    const totalACV = contractedACV + declinedACV;
+    if (totalACV > 0) {
+      contractedTax = taxAmount * (contractedACV / totalACV);
+      declinedTax   = taxAmount * (declinedACV  / totalACV);
+    } else {
+      contractedTax = taxAmount;
+    }
+  }
+
+  // Final totals including tax
+  const contractedRCVwTax  = contractedRCV  + contractedTax;
+  const contractedACVwTax  = contractedACV  + contractedTax;
+  const declinedRCVwTax    = declinedRCV    + declinedTax;
+  const declinedACVwTax    = declinedACV    + declinedTax;
+
+  // Net the declined-scope ACV (incl. tax) into Out of Pocket; surface the credit
+  // as a footnote on the OOP card instead of a separate Money-in-Pocket card.
+  const declinedCredit = Math.max(0, declinedACVwTax - deductible);
+  const oop = Math.max(0, deductible + contractedNonRecDep - declinedACVwTax);
+  const mip = declinedCredit; // kept for backward-compat with d.mip footnote in PDF
+  const firstCheckACV = (parsedData.summaryRCV || 0) - (parsedData.summaryRecDep || 0) - (parsedData.summaryNonRecDep || 0);
+  const pwiPerformedPDF = new Set();
+  document.querySelectorAll('.pwi-cb:checked').forEach(cb => {
+    pwiPerformedPDF.add(parseInt(cb.dataset.line));
+  });
+  let pwiRCVforPDF = 0;
+  parsedData.lineItems.forEach(item => {
+    if (item.paidWhenIncurred && pwiPerformedPDF.has(item.lineNumber)) {
+      // Use codeUpgradeRCV (Travelers Code Upgrade bucket) if available, else full item RCV
+      pwiRCVforPDF += (item.rcvOverride !== undefined ? item.rcvOverride : (parsedData.codeUpgradeRCV || item.rcv)) || 0;
+    }
+  });
+
+      // — SANITY CHECK —
+      recalcWarnings();
+
+  const pdfHTML = buildPDFHTML({
+    customerName, customerAddress, claimNumber,
+    carrier: parsedData.carrier || '',
+    policyType: parsedData.policyType || '',
+    deductible, oop,
+    // contracted
+    contractedRCV: contractedRCVwTax + pwiRCVforPDF,
+    contractedRecDep: contractedRecDep + (taxMethod === 'summary' && taxAmount > 0 ? (parsedData.summaryRecDep || 0) - contractedRecDep - (declinedItems.length > 0 ? declinedRecDep : 0) : 0),
+    contractedNonRecDep,
+    contractedACV: contractedACVwTax,
+    contractedTax,
+    // declined
+    declinedRCV: declinedRCVwTax,
+    declinedRecDep,
+    declinedNonRecDep,
+    declinedACV: declinedACVwTax,
+    declinedTax,
+    // tax info
+    taxMethod, taxRate, taxAmount,
+    // legacy fields still used by payment section
+    rcvContracted: contractedRCVwTax,
+    acvContracted: contractedACVwTax,
+    recDepContracted: (declinedItems.length === 0) ? (parsedData.summaryRecDep || contractedRecDep) : contractedRecDep,
+    nonRecDepContracted: contractedNonRecDep,
+    paidByInsurance: Math.max(0, firstCheckACV - deductible),
+    firstCheckACV,
+    pwiRCV: pwiRCVforPDF,
+    summaryNetIfRecovered: parsedData.summaryNetIfRecovered || 0,
+    summaryRCV: parsedData.summaryRCV || 0,
+    acceptedItems, declinedItems, mip
+  });
+
+  const win = window.open('', '_blank');
+  win.document.write(pdfHTML);
+  win.document.close();
+}
+
+function buildPDFHTML(d) {
+  const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+  const groupBySection = items => {
+    const s = {};
+    items.forEach(i => { const k = i.section || 'Other'; if (!s[k]) s[k] = []; s[k].push(i); });
+    return s;
+  };
+
+  const itemRowsHTML = (items) => items.map(i => i.paidWhenIncurred ? `
+    <tr style="background:#f0fff0">
+      <td>
+        <div style="color:#2a6e2a;font-weight:700">${i.description}</div>
+        <div style="font-size:10px;color:#2a6e2a;margin-top:2px">&#9654; PAID WHEN INCURRED — paid by insurance after work is completed</div>
+      </td>
+      <td style="text-align:center;color:#2a6e2a">${i.quantity}</td>
+      <td style="text-align:right;color:#2a6e2a;font-weight:700">$${fmtNum(i.rcvOverride !== undefined ? i.rcvOverride : i.rcv)}</td>
+      <td style="text-align:right">—</td>
+      <td style="text-align:right">—</td>
+      <td style="text-align:right;color:#2a6e2a;font-weight:700">$${fmtNum(i.rcvOverride !== undefined ? i.rcvOverride : i.acv)}</td>
+    </tr>` : `
+    <tr>
+      <td>${i.description}</td>
+      <td style="text-align:center">${i.quantity}</td>
+      <td style="text-align:right">$${fmtNum(i.rcv)}</td>
+      <td style="text-align:right">${i.recoverableDep > 0 ? '$'+fmtNum(i.recoverableDep) : '—'}</td>
+      <td style="text-align:right">${i.nonRecoverableDep > 0 ? '$'+fmtNum(i.nonRecoverableDep) : '—'}</td>
+      <td style="text-align:right">$${fmtNum(i.acv)}</td>
+    </tr>`).join('');
+
+  // ── TAX ROW (for summary-tax carriers) ──
+  const taxRowHTML = (taxAmt, infoOnly) => taxAmt > 0 ? `
+    <tr style="background:#fffbee">
+      <td style="font-style:italic;color:#886600">Sales Tax (${d.taxRate}% on materials — ${d.carrier} applies at summary level)</td>
+      <td style="text-align:center">—</td>
+      <td style="text-align:right;color:#886600;font-style:italic">${infoOnly ? 'included in RCV' : '$'+fmtNum(taxAmt)}</td>
+      <td style="text-align:right">—</td>
+      <td style="text-align:right">—</td>
+      <td style="text-align:right;color:#886600;font-style:italic">${infoOnly ? '(see breakdown)' : '$'+fmtNum(taxAmt)}</td>
+    </tr>` : '';
+
+  // ── SUBTOTAL ROW ──
+  const subtotalRowHTML = (rcv, recDep, nonRecDep, acv, label) => `
+    <tr style="background:#f0f0f0;font-weight:700;border-top:2px solid #333">
+      <td colspan="2" style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px">${label}</td>
+      <td style="text-align:right">$${fmtNum(rcv)}</td>
+      <td style="text-align:right">${recDep > 0 ? '$'+fmtNum(recDep) : '—'}</td>
+      <td style="text-align:right">${nonRecDep > 0 ? '$'+fmtNum(nonRecDep) : '—'}</td>
+      <td style="text-align:right">$${fmtNum(acv)}</td>
+    </tr>`;
+
+  const acceptedSections = groupBySection(d.acceptedItems);
+  const declinedSections = groupBySection(d.declinedItems);
+
+  let acceptedHTML = '';
+  Object.entries(acceptedSections).forEach(([sec, items]) => {
+    acceptedHTML += `<tr><td colspan="6" style="background:#f0f0f0;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;padding:6px 8px;color:#333">${sec}</td></tr>`;
+    acceptedHTML += itemRowsHTML(items);
+  });
+  // Add tax row then subtotal for contracted
+  // Tax shown as informational note only — not added to subtotal
+  if (d.contractedTax > 0) acceptedHTML += taxRowHTML(d.contractedTax, true);
+  acceptedHTML += subtotalRowHTML(d.contractedRCV, d.contractedRecDep, d.contractedNonRecDep, d.contractedACV, 'Contracted Totals');
+
+  let declinedHTML = '';
+  Object.entries(declinedSections).forEach(([sec, items]) => {
+    declinedHTML += `<tr><td colspan="6" style="background:#f0f0f0;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;padding:6px 8px;color:#333">${sec}</td></tr>`;
+    declinedHTML += itemRowsHTML(items);
+  });
+  // Add tax row then subtotal for declined
+  if (d.declinedItems.length > 0) {
+    declinedHTML += taxRowHTML(d.declinedTax);
+    declinedHTML += subtotalRowHTML(d.declinedRCV, d.declinedRecDep, d.declinedNonRecDep, d.declinedACV, 'Declined Totals');
+  }
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>RF Claim Report - ${d.customerName}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #222; }
+  .page { max-width: 800px; margin: 0 auto; padding: 32px; }
+  .rf-header { background: #CC1414; color: white; padding: 18px 24px; margin-bottom: 24px; border-radius: 4px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .rf-header .brand { font-size: 22px; font-weight: 900; }
+  .rf-header .sub { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+  .rf-header .date { font-size: 12px; opacity: 0.9; text-align: right; }
+  .customer-block { background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; padding: 14px 18px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cb-item .lbl { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cb-item .val { font-size: 14px; font-weight: 700; margin-top: 2px; }
+  .financials { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .fin-card { border: 2px solid #ddd; border-radius: 8px; padding: 16px; text-align: center; }
+  .fin-card.insurance { border-color: #2a6e2a; background: #f0fff0; }
+  .fin-card.customer { border-color: #8a2a2a; background: #fff0f0; }
+  .fin-card .fc-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px; }
+  .fin-card .fc-value { font-size: 28px; font-weight: 900; }
+  .fin-card.insurance .fc-value { color: #2a6e2a; }
+  .fin-card.customer .fc-value { color: #8a2a2a; }
+  .fin-card .fc-note { font-size: 11px; color: #888; margin-top: 6px; }
+  .timeline { background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; padding: 14px 18px; margin-bottom: 24px; }
+  .tl-title { font-weight: 700; margin-bottom: 10px; font-size: 13px; }
+  .tl-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; font-size: 12px; }
+  .tl-row:last-child { border-bottom: none; font-weight: 700; }
+  .tl-row.tax-row { background: #fffbee; color: #886600; font-style: italic; padding: 5px 6px; border-radius: 3px; }
+  .supplement-notice { background: #fff8e1; border: 1px solid #f0c040; border-radius: 4px; padding: 12px 16px; margin-bottom: 24px; font-size: 11px; color: #665500; line-height: 1.6; }
+  .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #CC1414; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 24px; }
+  th { background: #333; color: white; padding: 7px 8px; text-align: left; font-size: 11px; }
+  th:not(:first-child) { text-align: right; }
+  td { padding: 6px 8px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .declined-note { background: #fff0f0; border: 1px solid #ffcccc; border-radius: 4px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: #660000; line-height: 1.6; }
+  .sig-section { margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .sig-line { border-top: 1px solid #333; padding-top: 6px; font-size: 11px; color: #666; margin-top: 40px; }
+  @media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- PAGE 1: FINANCIAL SUMMARY -->
+  <div class="rf-header">
+    <div><div class="brand">ROOFING FORCE</div><div class="sub">Claim Scope Report</div></div>
+    <div class="date">${today}<br>${d.carrier} · ${d.policyType} Policy</div>
+  </div>
+
+  <div class="customer-block">
+    <div class="cb-item"><div class="lbl">Customer</div><div class="val">${d.customerName}</div></div>
+    <div class="cb-item"><div class="lbl">Claim Number</div><div class="val">${d.claimNumber || '—'}</div></div>
+    <div class="cb-item"><div class="lbl">Property Address</div><div class="val">${d.customerAddress}</div></div>
+    <div class="cb-item"><div class="lbl">Deductible</div><div class="val">$${fmtNum(d.deductible)}</div></div>
+  </div>
+
+  <div class="financials">
+    <div class="fin-card insurance">
+      <div class="fc-label">&#x1F4B0; 1st Check</div>
+      <div class="fc-value">$${fmtNum(Math.max(0, d.firstCheckACV - d.deductible))}</div>
+      <div class="fc-note">ACV (excl. PWI) &minus; deductible</div>
+    </div>
+    <div class="fin-card insurance">
+      <div class="fc-label">&#x1F4B0; 2nd Check</div>
+      <div class="fc-value">$${fmtNum(d.recDepContracted + (d.pwiRCV || 0))}</div>
+      <div class="fc-note">Rec dep + PWI performed</div>
+    </div>
+    <div class="fin-card customer">
+      <div class="fc-label">&#x1F3E0; Out of Pocket</div>
+      <div class="fc-value">$${fmtNum(d.oop)}</div>
+      <div class="fc-note">${d.declinedACV > 0 ? 'Deductible + non-rec dep − declined ACV (incl. tax)' : 'Deductible + non-rec dep'}</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-title">Payment Breakdown</div>
+    <div class="tl-row"><span>Total Replacement Cost Value (RCV)</span><span>$${fmtNum(d.contractedRCV)}</span></div>
+    <div class="tl-row"><span>Less Recoverable Depreciation (held by insurer)</span><span>−$${fmtNum(d.recDepContracted)}</span></div>
+    <div class="tl-row"><span>Less Non-Recoverable Depreciation</span><span>−$${fmtNum(d.nonRecDepContracted)}</span></div>
+    ${d.taxMethod === 'summary' && d.taxAmount > 0 ? `
+    <div class="tl-row tax-row"><span>⚠ Sales Tax (${d.taxRate}% on materials — ${d.carrier} applies at summary level)</span><span style="font-style:italic;color:#886600">included in RCV above</span></div>` : ''}
+    <div class="tl-row"><span>Less Deductible</span><span>−$${fmtNum(d.deductible)}</span></div>
+    <div class="tl-row"><span><strong>Initial Insurance Payment (ACV)</strong></span><span><strong>$${fmtNum(Math.max(0, d.firstCheckACV - d.deductible))}</strong></span></div>
+    ${d.recDepContracted > 0 ? `<div class="tl-row"><span>+ Recoverable Depreciation (paid after completion)</span><span>+$${fmtNum(d.recDepContracted)}</span></div>` : ''}
+    ${d.pwiRCV > 0 ? `<div class="tl-row"><span>+ PWI (paid when work completed)</span><span>+$${fmtNum(d.pwiRCV)}</span></div>` : ''}
+  </div>
+
+  <div class="supplement-notice">
+    <strong>Supplement Notice:</strong> Roofing Force reserves the right to review this scope of loss and submit supplemental claims for any items that were missed, undervalued, or identified during the course of repairs. All supplement payments are assigned to Roofing Force.
+  </div>
+  <div class="supplement-notice" style="background:#fff3e0;border-color:#e0a040;color:#5a3a00;margin-top:-16px">
+    <strong>Non-Covered Items</strong> necessary to complete the Project that are outside of the coverage of your insurance policy, including but is not limited to: rotten decking and/or facia, hidden damage, etc., will be your responsibility to pay.
+  </div>
+
+  <div style="page-break-after:always"></div>
+
+  <!-- PAGE 2: ACCEPTED LINE ITEMS -->
+  <div class="rf-header">
+    <div><div class="brand">ROOFING FORCE</div><div class="sub">Accepted Scope of Work</div></div>
+    <div class="date">${d.customerName}<br>Claim: ${d.claimNumber || '—'}</div>
+  </div>
+
+  <div class="section-title">Contracted Items (${d.acceptedItems.length})</div>
+  ${d.taxMethod === 'summary' && d.contractedTax > 0 ? `
+  <div style="background:#fffbee;border:1px solid #e0c040;border-radius:4px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#886600">
+    ⚠ <strong>${d.carrier}</strong> applies sales tax at the summary level. A tax line of <strong>$${fmtNum(d.contractedTax)}</strong> (${d.taxRate}% on materials) has been added below.
+  </div>` : ''}
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th style="text-align:center">Qty</th>
+        <th>RCV</th>
+        <th>Rec Dep</th>
+        <th>Non-Rec Dep</th>
+        <th>ACV</th>
+      </tr>
+    </thead>
+    <tbody>${acceptedHTML}</tbody>
+  </table>
+
+  <div style="page-break-after:always"></div>
+
+  <!-- PAGE 3: DECLINED ITEMS -->
+  <div class="rf-header">
+    <div><div class="brand">ROOFING FORCE</div><div class="sub">Declined Items</div></div>
+    <div class="date">${d.customerName}<br>Claim: ${d.claimNumber || '—'}</div>
+  </div>
+
+  <div class="section-title">Declined Items (${d.declinedItems.length})</div>
+
+  ${d.declinedItems.length > 0 ? `
+  <div class="declined-note">
+    <strong>Important:</strong> By declining the items listed below, you acknowledge that these repairs will not be completed by Roofing Force under this claim. Declining covered items may affect your future insurance coverage and ability to file related claims. Roofing Force is not responsible for any damage resulting from deferred repairs.
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th style="text-align:center">Qty</th>
+        <th>RCV</th>
+        <th>Rec Dep</th>
+        <th>Non-Rec Dep</th>
+        <th>ACV</th>
+      </tr>
+    </thead>
+    <tbody>${declinedHTML}</tbody>
+  </table>
+  <div class="sig-section">
+    <div><div class="sig-line">Customer Signature</div></div>
+    <div><div class="sig-line">Date</div></div>
+  </div>
+  ` : '<p style="color:#888;font-style:italic">No items were declined.</p>'}
+
+  <div style="margin-top:32px;font-size:10px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:12px">
+    Items not covered by insurance that are necessary to complete the project, including but not limited to rotten decking and/or facia, hidden damage, etc., will be your responsibility to pay.
+  </div>
+
+</div>
+
+<div id="mobile-toolbar" style="
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:2px solid #cc1e1e;
+  display:flex;gap:10px;padding:12px 16px;
+  box-shadow:0 -2px 10px rgba(0,0,0,0.15);
+  z-index:9999;
+">
+  <button onclick="window.print()" style="
+    flex:1;background:#cc1e1e;color:#fff;border:none;
+    border-radius:8px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;
+  ">&#128438; Save / Share PDF</button>
+  <button onclick="window.close()" style="
+    flex:0 0 auto;background:#eee;color:#333;border:none;
+    border-radius:8px;padding:12px 18px;font-size:15px;font-weight:700;cursor:pointer;
+  ">&#10005; Close</button>
+</div>
+<style>
+  @media print { #mobile-toolbar { display:none !important; } }
+  body { padding-bottom: 80px; }
+</style>
+
+</body>
+</html>`;
+}
+
+// ── HELPERS ──
+function fmt(n) { return '$' + fmtNum(n || 0); }
+function fmtNum(n) {
+  return (n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideError() {
+  document.getElementById('errorBox').classList.remove('show');
+}
+</script>
+</body>
+</html>
