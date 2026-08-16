@@ -10,14 +10,18 @@
 
 Test claim: **State Farm, claim 360K4V361 (Reichert, Crystal), deductible $2,237.00, RCV policy.**
 
-| Value | Eaveside shows | Correct (RF analyzer) | Cause |
+Verified against the actual claim PDF (page 3, "Summary for Coverage A"): RCV **$22,387.22**, Less Depreciation **(13,361.88)**, Less Deductible **(2,237.00)**, **Net Actual Cash Value Payment $6,788.34**. RF's report matches the carrier to the penny.
+
+| Value | Eaveside shows | Correct (RF analyzer / carrier) | Cause |
 |---|---|---|---|
-| 1st Check | $9,025.34 | **$6,788.34** | Deductible never captured from the PDF → subtracted $0 instead of $2,237 |
-| 2nd Check | $13,361.88 | **$13,616.93** | Paid-When-Incurred (PWI) item dropped → missing $255.05 |
+| Imported deductible | $0.00 | **$2,237.00** | Printed twice on the claim (page 1 header "Deductible: $2,237.00" and summary "Less Deductible (2,237.00)") — never imported |
+| 1st Check | $9,025.34 | **$6,788.34** | Missing deductible → subtracted $0 instead of $2,237 |
+| 2nd Check | $13,361.88 | **$13,616.93** (PWI performed) | Paid-When-Incurred (PWI) item dropped → missing $255.05 |
 | Out of Pocket | $0.00 | **$2,237.00** | Same missing deductible |
 | Ice & water barrier line | $0.00 RCV | **$255.05 PWI** | RCV column read literally; PWI amount lives in the note text |
+| Declining a line item | Reduces the 1st check | **Never changes the 1st check** | See §4 — declining changes the contract amount and out of pocket, not the carrier's ACV payment |
 
-Both defects are data-capture problems, not formula problems. Sections 2–3 define the capture rules; section 4 defines the math; section 6 is the acceptance test.
+These are data-capture and modeling problems, not formula problems. Sections 2–4 define the rules; section 5 defines the math; section 7 is the acceptance test.
 
 ---
 
@@ -37,12 +41,16 @@ PWI items are scope lines the carrier will only pay **after** the work is perfor
 - "paid when incurred"
 - "payable when incurred"
 - "code upgrade cost is payable when incurred"
+- "paid upon installation/documentation" (State Farm wording)
 
-**Amount extraction** — for PWI items the RCV column in the PDF is usually **blank or $0.00**. The real amount is in the note text, e.g.:
+State Farm additionally prints **"PWARR"** in the ACV column instead of a dollar amount on these lines — treat that marker as PWI too.
 
-> "168.76 SF of Ice & water barrier @ $1.51 per SF = $255.05"
+**Amount extraction** — for PWI items the RCV column in the PDF is usually **blank or $0.00**. The real amount is in the note text. Verbatim from this claim (line 9):
 
-Extract the dollar amount from the note and store it as the item's PWI RCV. **Never leave a PWI item at $0 when the note contains a dollar amount.** (This is exactly what Eaveside did — it read the $0.00 column and the $255.05 vanished.)
+> "Ice & water barrier — 168.76 SF — PWARR
+> Code Item. Paid upon installation/documentation. Unit Price $1.48 Total $255.05"
+
+Extract the dollar amount from the note ($255.05) and store it as the item's PWI RCV. **Never leave a PWI item at $0 when the note contains a dollar amount.** (This is exactly what Eaveside did — it read the $0.00 column and the $255.05 vanished.)
 
 Special case: if the summary page has a "Dwelling – Ordinance or Law – Code Upgrade Paid When Incurred" section (Travelers style), extract its "Total Paid When Incurred" as `codeUpgradeRCV` and prefer it over per-item amounts.
 
@@ -56,7 +64,31 @@ Special case: if the summary page has a "Dwelling – Ordinance or Law – Code 
 
 ---
 
-## 4. Calculation engine (verbatim from working implementation)
+## 4. Declined items: what changes and what never changes
+
+When the customer declines line items (work the contractor will not perform):
+
+**The 1st check NEVER changes.** The 1st check is the carrier's ACV payment on the **full approved scope** minus the deductible — the amount printed on the claim as "Net Actual Cash Value Payment." The carrier issues it regardless of which items the contractor performs. Declining items must not reduce it. (This is Eaveside's current behavior and it is wrong.)
+
+**What declining DOES change:**
+
+| Value | Effect of declining a line |
+|---|---|
+| 1st Check | **None — ever** |
+| Contract amount (what the contractor signs for) | Reduced — contractor collects only the **RCV of performed work**: `summaryRCV − Σ rcv(declined) + PWI performed` |
+| 2nd Check | Reduced only by the declined lines' **recoverable dep** (carrier releases rec dep only on completed work) |
+| Out of Pocket | Reduced — the declined lines' **ACV is credited to the customer** against deductible + non-rec dep |
+
+Worked example on this claim — decline line 1 (Tear off, $1,831.95, no dep) and line 21 (A/C comb, $185.53, no dep), declined ACV = $2,017.48:
+
+- 1st check: **$6,788.34 — unchanged**
+- Contract amount: 22,387.22 − 2,017.48 = **$20,369.74**
+- 2nd check: **$13,361.88 — unchanged** (neither declined line carries rec dep)
+- Out of pocket: max(0, 2,237.00 + 0 − 2,017.48) = **$219.52**
+
+---
+
+## 5. Calculation engine (verbatim from working implementation)
 
 Inputs per line item: `rcv`, `recoverableDep`, `nonRecoverableDep`, `acv`, `paidWhenIncurred`, plus summary-page grand totals `summaryRCV`, `summaryRecDep`, `summaryNonRecDep`, `summaryNetClaim`, `deductible`.
 
@@ -82,13 +114,14 @@ displayedTotalRCV = summaryRCV − Σ rcv(declined lines) + pwiPerformed
 ```
 
 Key invariants:
+- **`firstCheck` is computed from summary-page totals only. Declined lines never enter the formula.**
 - **PWI never counts toward ACV or the 1st check.** It moves money into the 2nd check only, and only when marked "will perform."
-- Declining a line reduces displayed RCV and rec dep, and credits the line's ACV against the customer's out of pocket.
+- Declining a line reduces displayed RCV (the contract amount) and rec dep, and credits the line's ACV against the customer's out of pocket — see §4.
 - Sanity check shown to the user: `firstCheck` must equal the summary page's **Net Claim** within $1.00 (when nothing is declined and no PWI). If not, show a warning instead of the "numbers verified" badge.
 
 ---
 
-## 5. Sales tax handling (needed for correct totals on several carriers)
+## 6. Sales tax handling (needed for correct totals on several carriers)
 
 - Detect `taxMethod` from the line-item table headers: a per-line **TAX** column ⇒ `line_item` (tax already baked into each RCV — no extra handling). No TAX column ⇒ `summary` (tax added once on the summary page).
 - **Shelter Insurance is always `summary`** regardless of columns.
@@ -98,7 +131,7 @@ Key invariants:
 
 ---
 
-## 6. Acceptance test — State Farm / Reichert claim
+## 7. Acceptance test — State Farm / Reichert claim
 
 Parse the State Farm claim PDF (claim 360K4V361). Expected extraction:
 
@@ -119,11 +152,20 @@ Expected outputs, no lines declined:
 
 Derivations: trueACV = 22,387.22 − 13,361.88 − 0 = **9,025.34**; 1st check = 9,025.34 − 2,237 = **6,788.34**; 2nd check (checked) = 13,361.88 + 255.05 = **13,616.93**.
 
-An implementation that shows 1st check $9,025.34, 2nd check $13,361.88 with PWI checked, or out of pocket $0.00 on this claim **fails** the test.
+Declined-items scenario — decline line 1 (Tear off, $1,831.95) and line 21 (A/C comb, $185.53), PWI unchecked:
+
+| Value | Expected |
+|---|---|
+| 1st Check | **$6,788.34 — unchanged** |
+| Contract amount / displayed RCV | $20,369.74 |
+| 2nd Check | $13,361.88 (declined lines carry no rec dep) |
+| Out of Pocket | $219.52 |
+
+An implementation that shows 1st check $9,025.34, reduces the 1st check when items are declined, shows 2nd check $13,361.88 with PWI checked, or shows out of pocket $0.00 on this claim **fails** the test.
 
 ---
 
-## 7. Reference code map
+## 8. Reference code map
 
 | Behavior | File in `gdavis-roofing/rf-claim-analyzer` |
 |---|---|
