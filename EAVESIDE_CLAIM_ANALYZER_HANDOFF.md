@@ -184,6 +184,8 @@ Correct steps and total:
 
 **Invariant:** the payment-recovery total must equal the contract RCV (+ PWI performed + approved supplements). It can **never exceed** it. Any recovery total above RCV is a double count. (With the Ice & water PWI performed, the correct total is 22,387.22 + 255.05 = $22,642.27, and dep-received step becomes $13,616.93.)
 
+**Recoverable Depreciation field must track declines.** Observed: declining three window lines correctly reduced the 2nd check to $10,780.66 (13,361.88 − 2,581.22 declined rec dep), but the "Recoverable Depreciation" field below stayed at $13,361.88. These are the same concept — rec dep on the work being performed — and **must always match**. The carrier releases depreciation only on completed work, so a stale $13,361.88 feeding the Payment Recovery tracker bills for depreciation that will never be paid. The original $13,361.88 may be shown only as a clearly-labeled "parsed from claim" reference value. Rule: every field that drives billing or payment recovery recomputes from the contracted (non-declined) scope, live, on every decline/undecline — none of them may hold the claim's static parsed value.
+
 ---
 
 ## 9. Reference code map
