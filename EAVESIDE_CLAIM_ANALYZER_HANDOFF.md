@@ -165,7 +165,28 @@ An implementation that shows 1st check $9,025.34, reduces the 1st check when ite
 
 ---
 
-## 8. Reference code map
+## 8. Payment tracking: field labels and the recovery total
+
+Observed on Eaveside's claim form after the deductible import was fixed (deductible now imports at $2,237.00 — good):
+
+**Field label.** The field labeled **"ACV (Initial Payment)"** holds $9,025.34. That is mislabeled: $9,025.34 is the **ACV amount** of the scope. The **initial payment** is ACV − deductible = **$6,788.34** — the check the carrier actually cuts (the claim's "Net Actual Cash Value Payment"). Label the field "ACV Amount" and derive Initial Payment = ACV − deductible.
+
+**Payment Recovery total.** Eaveside shows Total **$24,624.22** = 9,025.34 (full ACV) + 2,237.00 (deductible) + 13,361.88 (dep received). This **double-counts the deductible by exactly $2,237.00** — the deductible is already inside the $9,025.34, then it is added again as its own step. The total exceeds the entire claim RCV, which means the customer would be over-billed by one deductible.
+
+Correct steps and total:
+
+| Step | Amount | Source |
+|---|---|---|
+| 1. Carrier ACV check | **$6,788.34** | ACV − deductible |
+| 2. Customer deductible | $2,237.00 | Collected from customer |
+| 3. Recoverable dep received | $13,361.88 | Carrier, after completion |
+| **Total** | **$22,387.22** | **= contract RCV** |
+
+**Invariant:** the payment-recovery total must equal the contract RCV (+ PWI performed + approved supplements). It can **never exceed** it. Any recovery total above RCV is a double count. (With the Ice & water PWI performed, the correct total is 22,387.22 + 255.05 = $22,642.27, and dep-received step becomes $13,616.93.)
+
+---
+
+## 9. Reference code map
 
 | Behavior | File in `gdavis-roofing/rf-claim-analyzer` |
 |---|---|
