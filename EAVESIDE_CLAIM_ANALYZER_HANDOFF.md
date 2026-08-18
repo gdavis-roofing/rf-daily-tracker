@@ -54,6 +54,12 @@ Extract the dollar amount from the note ($255.05) and store it as the item's PWI
 
 Special case: if the summary page has a "Dwelling – Ordinance or Law – Code Upgrade Paid When Incurred" section (Travelers style), extract its "Total Paid When Incurred" as `codeUpgradeRCV` and prefer it over per-item amounts.
 
+**Reconciliation must be PWI-aware.** Observed on Eaveside after PWI was implemented: checking the Ice & water PWI line correctly adds $255.05 to the 2nd check, but flips the "Numbers verified" badge to *"Off by $255.05 — RCV vs ACV+depreciation don't reconcile."* That warning is a false positive. A PWI line intentionally has RCV with $0 ACV and $0 depreciation — the carrier pays it only at completion, so it can never satisfy `rcv = acv + dep`. The rules:
+
+- Per-line validation `rcv = acv + recDep + nonRecDep` applies to **non-PWI lines only**.
+- Totals identity: `displayed RCV = trueACV + recDep + nonRecDep + PWI performed`.
+- A "mismatch" equal to exactly the PWI amount is the signature of a reconciliation check that forgot to exclude PWI.
+
 **Required UI behavior for PWI lines:**
 - Cannot be declined (no decline checkbox).
 - Show a checkbox: **"Paid when incurred — check if [contractor] will perform."**
@@ -161,7 +167,9 @@ Declined-items scenario — decline line 1 (Tear off, $1,831.95) and line 21 (A/
 | 2nd Check | $13,361.88 (declined lines carry no rec dep) |
 | Out of Pocket | $219.52 |
 
-An implementation that shows 1st check $9,025.34, reduces the 1st check when items are declined, shows 2nd check $13,361.88 with PWI checked, or shows out of pocket $0.00 on this claim **fails** the test.
+PWI-reconciliation scenario: with the Ice & water PWI checked, the "numbers verified" state must remain green — RCV = ACV + rec dep + non-rec dep + $255.05 PWI balances. Showing an "off by $255.05" mismatch warning **fails** the test.
+
+An implementation that shows 1st check $9,025.34, reduces the 1st check when items are declined, shows 2nd check $13,361.88 with PWI checked, shows out of pocket $0.00, or flags a reconciliation error when a PWI item is marked performed on this claim **fails** the test.
 
 ---
 
